@@ -32,6 +32,7 @@ public class GUI extends JFrame {
 	 * Create the frame.
 	 */
 	public GUI() {
+		//lajsdlkfjasdlkjf
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 553, 478);
 		contentPane = new JPanel();
