@@ -1,6 +1,8 @@
 package conexion;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 
@@ -70,5 +72,34 @@ public class Conexion {
 				e.printStackTrace();
 			}
 		}
+	}
+	
+	public static ResultSet executeQuery(String st){
+		fetchConnection();
+		PreparedStatement ps=null;
+		try {
+			ps=connection.prepareStatement(st);
+			close();
+			return ps.executeQuery();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			close();
+			return null;
+		}
+		
+	}
+	public static int executeUpdate(String st){
+		fetchConnection();
+		PreparedStatement ps=null;
+		try {
+			ps=connection.prepareStatement(st);
+			return ps.executeUpdate();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		close();
+		return -1;
 	}
 }
