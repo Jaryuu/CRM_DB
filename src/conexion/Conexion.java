@@ -51,22 +51,17 @@ public class Conexion {
 		}
 		if (connection != null) {
 			System.out.println("You made it, take control your database now!");
-			try {
-				connection.close();
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
 		} else {
 			System.out.println("Failed to make connection!");
 		}
 	}
 	
 	public static void close(){
-		connection=null;
+		
 		if (connection != null) {	
 			try {
 				connection.close();
+				connection=null;
 			} catch (SQLException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -79,8 +74,9 @@ public class Conexion {
 		PreparedStatement ps=null;
 		try {
 			ps=connection.prepareStatement(st);
+			ResultSet res=ps.executeQuery();
 			close();
-			return ps.executeQuery();
+			return res;
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -94,12 +90,29 @@ public class Conexion {
 		PreparedStatement ps=null;
 		try {
 			ps=connection.prepareStatement(st);
-			return ps.executeUpdate();
+			int res=ps.executeUpdate();
+			close();
+			return res;
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		close();
 		return -1;
+	}
+	public static boolean execute(String st){
+		fetchConnection();
+		PreparedStatement ps=null;
+		try {
+			ps=connection.prepareStatement(st);
+			boolean res=ps.execute();
+			close();
+			return res;
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		close();
+		return false;
 	}
 }

@@ -34,7 +34,7 @@ public class Main {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
+		/*
 		Connection connection = Conexion.getConexion();
 		Conexion.close();
 		connection=Conexion.getConexion();
@@ -62,7 +62,7 @@ public class Main {
 			e.printStackTrace();
 		}
 		
-		
+		*/
 	}
  
 }

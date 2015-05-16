@@ -6,6 +6,9 @@ import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 import javax.swing.AbstractAction;
@@ -21,6 +24,8 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
+
+import controladores.ControladorCliente;
 
 import java.awt.event.ActionListener;
 
@@ -39,7 +44,7 @@ public class GUI extends JFrame {
 	private ArrayList<JLabel> lblCamposPopUp;
 	private DefaultTableModel model;
 	private int columnBorrar, columnActualizar;
-	
+	private ResultSet clientes;
 	// Para Pop-Up de crear columna
 	private JLabel lblColTipo, lblColNombre;
 	private JComboBox jcbTipos;
@@ -67,18 +72,39 @@ public class GUI extends JFrame {
 		String borrar = "Borrar";
 		String actualizar = "Actualizar";
 		tiposCols = new ArrayList<String>();
-		columnNames = new String[]{"Nombre", "Apellido", "", ""};
+		columnNames = new String[]{};
 		columnBorrar=columnNames.length-1;
 		columnActualizar=columnNames.length-2;
-		data = new Object[][]{				
-				{"Diego", "Pato", actualizar, borrar},
-				{"Julio", "Twitter", actualizar, borrar}
-		};
+		data = new Object[][]{};
 		model = new DefaultTableModel(data, columnNames);		
 		
 		jtbUsuarios = new JTable(model);
+		
 		jspUsuarios = new JScrollPane(jtbUsuarios);
-
+		//inicializando la tabla
+		clientes=ControladorCliente.getAllClientes();
+		//crear campos
+		ResultSetMetaData metadata=null;
+		try {
+			metadata=clientes.getMetaData();
+			columnNames=new String[metadata.getColumnCount()];
+			for(int i=0;i<metadata.getColumnCount();i++){
+				model.addColumn(metadata.getColumnName(i+1));
+				columnNames[i]=metadata.getColumnName(i+1);
+			}
+			while(clientes.next()){
+				Object[] fila = new Object[columnNames.length];
+				for(int i=0;i<columnNames.length;i++){
+					fila[i]=clientes.getObject(columnNames[i]);
+				}
+				model.addRow(fila);
+			}
+		} catch (SQLException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		columnBorrar=columnNames.length-1;
+		columnActualizar=columnNames.length-2;
 		// Boton borrar
 		delete = new AbstractAction()
 		{
@@ -113,7 +139,7 @@ public class GUI extends JFrame {
 		
 		pnlEditarUsuario.add(jspUsuarios, BorderLayout.CENTER);		
 		
-		// Paneles para los crear cliente 
+		// Paneles para los creak client 
 		pnlCrearUsuario = new JPanel();
 		pnlCrearUsuario.setLayout(new BorderLayout(0,0));
 		pnlBotonesCliente = new JPanel();
@@ -205,9 +231,8 @@ public class GUI extends JFrame {
 		int result = JOptionPane.showConfirmDialog(null, pnlPopUpAgrCol, "Agregar Campo",
 	            JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 		if (result == JOptionPane.OK_OPTION) {
-			//System.out.println(jcbTipos.getSelectedItem());
-            //System.out.println(jtfColNombre.getText());	
             //model.addColumn(jtfColNombre.getText());
+			//ControladorCliente.addCampo(jtfColNombre.getText(), jcbTipos.getSelectedItem().toString());
             agregarColumna(jtfColNombre.getText());
         } else {
             System.out.println("Cancelled");
@@ -215,7 +240,7 @@ public class GUI extends JFrame {
 	}
 	
 	// Este metodo agrega una columna antes de los botones
-	private void agregarColumna(String nombre){
+	private void agregarColumna(String nombre){		
 		String [] temp = new String[columnNames.length+1];
 		for (int x=0; x<columnNames.length-2;x++){
 			temp[x] = columnNames[x];
@@ -225,5 +250,7 @@ public class GUI extends JFrame {
 		temp[temp.length-1] = "";		
 		columnNames = temp;		
 	}
-	
+	private void llenarTabla(){
+		
+	}
 }
