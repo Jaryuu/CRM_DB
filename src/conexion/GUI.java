@@ -88,7 +88,47 @@ public class GUI extends JFrame {
 		
 		jspUsuarios = new JScrollPane(jtbUsuarios, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		//inicializando la tabla
+<<<<<<< HEAD
 		llenarTabla();
+=======
+<<<<<<< HEAD
+		llenarTabla();
+=======
+		clientes=ControladorCliente.getAllClientes();
+		//crear campos
+		ResultSetMetaData metadata=null;
+		try {
+			metadata=clientes.getMetaData();
+			int tamanoMD =metadata.getColumnCount(); 
+			int tamano = tamanoMD+2;
+			columnNames=new String[tamano];
+			for(int i=0;i<tamano;i++){
+				if (i>=tamanoMD){
+					model.addColumn("");
+					columnNames[i] = "";
+				}else{
+					model.addColumn(metadata.getColumnName(i+1));
+					columnNames[i]=metadata.getColumnName(i+1);
+				}				
+			}
+			columnActualizar = tamano-2;
+			columnBorrar = tamano-1;
+			while(clientes.next()){				
+				Object[] fila = new Object[columnNames.length];
+				for(int i=0;i<tamano;i++){
+					fila[i]=clientes.getObject(columnNames[i]);
+				}
+				fila[columnActualizar] = "Actualizar";
+				fila[columnBorrar] = "Borrar";				
+				model.addRow(fila);
+			}
+			
+		} catch (SQLException e1) {
+			e1.printStackTrace();
+		}
+		
+>>>>>>> branch 'master' of https://github.com/Jaryuu/CRM_DB.git
+>>>>>>> branch 'master' of https://github.com/Jaryuu/CRM_DB.git
 		// Boton borrar
 		delete = new AbstractAction()
 		{
@@ -310,6 +350,7 @@ public class GUI extends JFrame {
 		ResultSetMetaData metadata=null;
 		try {
 			metadata=clientes.getMetaData();
+<<<<<<< HEAD
 			int tamanoMD =metadata.getColumnCount(); 
 			int tamano = tamanoMD+2;
 			columnNames=new String[tamano];
@@ -338,5 +379,25 @@ public class GUI extends JFrame {
 			e1.printStackTrace();
 		}
 		
+=======
+			columnNames=new String[metadata.getColumnCount()];
+			for(int i=0;i<metadata.getColumnCount();i++){
+				model.addColumn(metadata.getColumnName(i+1));
+				columnNames[i]=metadata.getColumnName(i+1);
+			}
+			while(clientes.next()){
+				Object[] fila = new Object[columnNames.length];
+				for(int i=0;i<columnNames.length;i++){
+					fila[i]=clientes.getObject(columnNames[i]);
+				}
+				model.addRow(fila);
+			}
+		} catch (SQLException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		columnBorrar=columnNames.length-1;
+		columnActualizar=columnNames.length-2;
+>>>>>>> branch 'master' of https://github.com/Jaryuu/CRM_DB.git
 	}
 }
