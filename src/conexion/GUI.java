@@ -88,39 +88,7 @@ public class GUI extends JFrame {
 		
 		jspUsuarios = new JScrollPane(jtbUsuarios, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		//inicializando la tabla
-		clientes=ControladorCliente.getAllClientes();
-		//crear campos
-		ResultSetMetaData metadata=null;
-		try {
-			metadata=clientes.getMetaData();
-			int tamanoMD =metadata.getColumnCount(); 
-			int tamano = tamanoMD+2;
-			columnNames=new String[tamano];
-			for(int i=0;i<tamano;i++){
-				if (i>=tamanoMD){
-					model.addColumn("");
-					columnNames[i] = "";
-				}else{
-					model.addColumn(metadata.getColumnName(i+1));
-					columnNames[i]=metadata.getColumnName(i+1);
-				}				
-			}
-			columnActualizar = tamano-2;
-			columnBorrar = tamano-1;
-			while(clientes.next()){				
-				Object[] fila = new Object[columnNames.length];
-				for(int i=0;i<tamano;i++){
-					fila[i]=clientes.getObject(columnNames[i]);
-				}
-				fila[columnActualizar] = "Actualizar";
-				fila[columnBorrar] = "Borrar";				
-				model.addRow(fila);
-			}
-			
-		} catch (SQLException e1) {
-			e1.printStackTrace();
-		}
-		
+		llenarTabla();
 		// Boton borrar
 		delete = new AbstractAction()
 		{
@@ -337,6 +305,38 @@ public class GUI extends JFrame {
 		columnNames = temp;		
 	}
 	private void llenarTabla(){
+		clientes=ControladorCliente.getAllClientes();
+		//crear campos
+		ResultSetMetaData metadata=null;
+		try {
+			metadata=clientes.getMetaData();
+			int tamanoMD =metadata.getColumnCount(); 
+			int tamano = tamanoMD+2;
+			columnNames=new String[tamano];
+			for(int i=0;i<tamano;i++){
+				if (i>=tamanoMD){
+					model.addColumn("");
+					columnNames[i] = "";
+				}else{
+					model.addColumn(metadata.getColumnName(i+1));
+					columnNames[i]=metadata.getColumnName(i+1);
+				}				
+			}
+			columnActualizar = tamano-2;
+			columnBorrar = tamano-1;
+			while(clientes.next()){				
+				Object[] fila = new Object[columnNames.length];
+				for(int i=0;i<tamano;i++){
+					fila[i]=clientes.getObject(columnNames[i]);
+				}
+				fila[columnActualizar] = "Actualizar";
+				fila[columnBorrar] = "Borrar";				
+				model.addRow(fila);
+			}
+			
+		} catch (SQLException e1) {
+			e1.printStackTrace();
+		}
 		
 	}
 }
