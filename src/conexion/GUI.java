@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.Desktop.Action;
 import java.awt.Dimension;
 import java.awt.EventQueue;
+import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.sql.ResultSet;
@@ -12,6 +13,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 import javax.swing.AbstractAction;
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
@@ -31,7 +33,7 @@ import java.awt.event.ActionListener;
 
 public class GUI extends JFrame {
 
-	private JPanel contentPane;
+	private JPanel contentPane, pnlFiltros;
 	private JPanel pnlEditarUsuario, pnlCrearUsuario, pnlBotonesCliente;
 	private JTable jtbUsuarios;
 	private JScrollPane jspUsuarios;
@@ -44,11 +46,13 @@ public class GUI extends JFrame {
 	private ArrayList<JLabel> lblCamposPopUp;
 	private DefaultTableModel model;
 	private int columnBorrar, columnActualizar;
+	private JButton btnMostrarFiltros, btnOcultarFiltros, btnFiltrar;
 	private ResultSet clientes;
+	private JScrollPane jspFiltros;
 	// Para Pop-Up de crear columna
 	private JLabel lblColTipo, lblColNombre;
 	private JComboBox jcbTipos;
-	private JTextField jtfColNombre;
+	private JTextField jtfColNombre;	
 	
 
 	/**
@@ -64,8 +68,9 @@ public class GUI extends JFrame {
 		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
 		contentPane.add(tabbedPane, BorderLayout.CENTER);
 		
+		// Panel para editar clientes -------------------------------------------------------------------------------------------------------------
 		pnlEditarUsuario = new JPanel();
-		tabbedPane.addTab("Editar Usuario", null, pnlEditarUsuario, null);
+		tabbedPane.addTab("Editar Clientes", null, pnlEditarUsuario, null);
 		pnlEditarUsuario.setLayout(new BorderLayout(0, 0));
 		
 		// Datos de jtable		
@@ -79,32 +84,43 @@ public class GUI extends JFrame {
 		model = new DefaultTableModel(data, columnNames);		
 		
 		jtbUsuarios = new JTable(model);
+		jtbUsuarios.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 		
-		jspUsuarios = new JScrollPane(jtbUsuarios);
+		jspUsuarios = new JScrollPane(jtbUsuarios, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		//inicializando la tabla
 		clientes=ControladorCliente.getAllClientes();
 		//crear campos
 		ResultSetMetaData metadata=null;
 		try {
 			metadata=clientes.getMetaData();
-			columnNames=new String[metadata.getColumnCount()];
-			for(int i=0;i<metadata.getColumnCount();i++){
-				model.addColumn(metadata.getColumnName(i+1));
-				columnNames[i]=metadata.getColumnName(i+1);
+			int tamanoMD =metadata.getColumnCount(); 
+			int tamano = tamanoMD+2;
+			columnNames=new String[tamano];
+			for(int i=0;i<tamano;i++){
+				if (i>=tamanoMD){
+					model.addColumn("");
+					columnNames[i] = "";
+				}else{
+					model.addColumn(metadata.getColumnName(i+1));
+					columnNames[i]=metadata.getColumnName(i+1);
+				}				
 			}
-			while(clientes.next()){
+			columnActualizar = tamano-2;
+			columnBorrar = tamano-1;
+			while(clientes.next()){				
 				Object[] fila = new Object[columnNames.length];
-				for(int i=0;i<columnNames.length;i++){
+				for(int i=0;i<tamano;i++){
 					fila[i]=clientes.getObject(columnNames[i]);
 				}
+				fila[columnActualizar] = "Actualizar";
+				fila[columnBorrar] = "Borrar";				
 				model.addRow(fila);
 			}
+			
 		} catch (SQLException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-		columnBorrar=columnNames.length-1;
-		columnActualizar=columnNames.length-2;
+		
 		// Boton borrar
 		delete = new AbstractAction()
 		{
@@ -127,7 +143,7 @@ public class GUI extends JFrame {
 		        //System.out.println(nit);
 		    }
 		};
-		
+				
 		ButtonColumn buttonBorrar = new ButtonColumn(jtbUsuarios, delete, columnBorrar);
 		jtbUsuarios.getColumnModel().getColumn(columnBorrar).setMaxWidth(100);
 		jtbUsuarios.setRowHeight(30);
@@ -160,14 +176,82 @@ public class GUI extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				crearPopUpAgrCol();
 			}
-		});
-		
+		});		
 		pnlBotonesCliente.add(btnAgregarCampo);
 		pnlBotonesCliente.add(btnCrearCliente);
 		pnlCrearUsuario.add(pnlBotonesCliente, BorderLayout.EAST);	
 		pnlEditarUsuario.add(pnlCrearUsuario, BorderLayout.SOUTH);
 		
+		// --------------------------------------------------------------------------------------------------------------
 		
+		// Panel para filtrar clientes que se muestran
+		pnlFiltros = new JPanel();
+		pnlFiltros.setBorder(BorderFactory.createTitledBorder("Filtros"));		
+		jspFiltros = new JScrollPane(pnlFiltros);
+		pnlEditarUsuario.add(jspFiltros, BorderLayout.EAST);	
+		
+		btnMostrarFiltros = new JButton("Mostrar");
+		btnMostrarFiltros.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				mostrarFiltros();
+			}
+		});
+		btnOcultarFiltros = new JButton("Ocultar");
+		btnOcultarFiltros.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				ocultarFiltros();		
+			}
+		});		
+		btnFiltrar = new JButton("Filtrar");
+		btnFiltrar.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				// Funcion para aplicar filtros
+				ArrayList<String[]> filtros = new ArrayList<String[]>();
+				for (int x=0; x<jtfCamposPopUp.size(); x++){
+					JTextField actual = jtfCamposPopUp.get(x);
+					String[] unFiltro = new String[2];
+					if (! actual.getText().equals("")){
+						unFiltro[0] = lblCamposPopUp.get(x).getText();
+						unFiltro[1] = actual.getText();
+						filtros.add(unFiltro);
+					}										
+				}
+				// filtros es el arraylista a mandar
+//				for (int x=0; x<filtros.size(); x++){
+//					System.out.println(filtros.get(x)[0]+ " : "+filtros.get(x)[1]);
+//				}
+			}
+		});	
+		ocultarFiltros();	
+		
+	}
+	
+	private void mostrarFiltros(){
+		pnlFiltros.removeAll();
+		pnlFiltros.setPreferredSize(new Dimension(300, pnlFiltros.getHeight()));
+		pnlFiltros.setLayout(new GridLayout(0,2));
+		jtfCamposPopUp = new ArrayList<JTextField>();
+		lblCamposPopUp = new ArrayList<JLabel>();
+		for (int x=0; x<columnNames.length; x++){			
+			String campo = columnNames[x];			
+			if (! campo.equals("")){
+				lblCamposPopUp.add(new JLabel(columnNames[x]+":"));
+				jtfCamposPopUp.add(new JTextField());
+				pnlFiltros.add(lblCamposPopUp.get(x));
+				pnlFiltros.add(jtfCamposPopUp.get(x));
+			}			
+		}				
+		pnlFiltros.add(btnOcultarFiltros);
+		pnlFiltros.add(btnFiltrar);
+	}
+	
+	private void ocultarFiltros(){
+		pnlFiltros.removeAll();	
+		pnlFiltros.setLayout(new FlowLayout());
+		pnlFiltros.setPreferredSize(new Dimension(100, pnlFiltros.getHeight()));
+		pnlFiltros.add(btnMostrarFiltros);
+		pnlEditarUsuario.repaint();
+		pnlEditarUsuario.revalidate();
 	}
 	
 	private void crearPopUpCrearCliente(){
@@ -175,8 +259,8 @@ public class GUI extends JFrame {
 		JPanel pnlPopUp = new JPanel(new GridLayout(0, 1));
 		jtfCamposPopUp = new ArrayList<JTextField>();
 		lblCamposPopUp = new ArrayList<JLabel>();
-		for (int x=0; x<columnNames.length; x++){
-			String campo = columnNames[x];
+		for (int x=0; x<columnNames.length; x++){			
+			String campo = columnNames[x];			
 			if (! campo.equals("")){
 				lblCamposPopUp.add(new JLabel(columnNames[x]+":"));
 				jtfCamposPopUp.add(new JTextField());
@@ -214,13 +298,13 @@ public class GUI extends JFrame {
 	}
 	
 	private void crearPopUpAgrCol(){
-		// Pop-up del form para crear un cliente
+		// Pop-up del form para crear un cliente		
 		JPanel pnlPopUpAgrCol = new JPanel(new GridLayout(0, 1));
 		lblColTipo = new JLabel("Tipo Campo");
 		String[] tipos = {"int", "real", "text", "date"};
 		jcbTipos = new JComboBox(tipos);
 		lblColNombre = new JLabel("Nombre de Nuevo Campo:");
-		jtfColNombre = new JTextField();
+		jtfColNombre = new JTextField();		
 		
 		// Agregamos al panel
 		pnlPopUpAgrCol.add(lblColTipo);
@@ -228,7 +312,9 @@ public class GUI extends JFrame {
 		pnlPopUpAgrCol.add(lblColNombre);
 		pnlPopUpAgrCol.add(jtfColNombre);
 		
-		int result = JOptionPane.showConfirmDialog(null, pnlPopUpAgrCol, "Agregar Campo",
+		JScrollPane jspPopUpAgrCol = new JScrollPane(pnlPopUpAgrCol);
+		
+		int result = JOptionPane.showConfirmDialog(null, jspPopUpAgrCol, "Agregar Campo",
 	            JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 		if (result == JOptionPane.OK_OPTION) {
             //model.addColumn(jtfColNombre.getText());
