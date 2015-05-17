@@ -82,29 +82,7 @@ public class GUI extends JFrame {
 		
 		jspUsuarios = new JScrollPane(jtbUsuarios);
 		//inicializando la tabla
-		clientes=ControladorCliente.getAllClientes();
-		//crear campos
-		ResultSetMetaData metadata=null;
-		try {
-			metadata=clientes.getMetaData();
-			columnNames=new String[metadata.getColumnCount()];
-			for(int i=0;i<metadata.getColumnCount();i++){
-				model.addColumn(metadata.getColumnName(i+1));
-				columnNames[i]=metadata.getColumnName(i+1);
-			}
-			while(clientes.next()){
-				Object[] fila = new Object[columnNames.length];
-				for(int i=0;i<columnNames.length;i++){
-					fila[i]=clientes.getObject(columnNames[i]);
-				}
-				model.addRow(fila);
-			}
-		} catch (SQLException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-		columnBorrar=columnNames.length-1;
-		columnActualizar=columnNames.length-2;
+		llenarTabla();
 		// Boton borrar
 		delete = new AbstractAction()
 		{
@@ -251,6 +229,28 @@ public class GUI extends JFrame {
 		columnNames = temp;		
 	}
 	private void llenarTabla(){
-		
+		clientes=ControladorCliente.getAllClientes();
+		//crear campos
+		ResultSetMetaData metadata=null;
+		try {
+			metadata=clientes.getMetaData();
+			columnNames=new String[metadata.getColumnCount()];
+			for(int i=0;i<metadata.getColumnCount();i++){
+				model.addColumn(metadata.getColumnName(i+1));
+				columnNames[i]=metadata.getColumnName(i+1);
+			}
+			while(clientes.next()){
+				Object[] fila = new Object[columnNames.length];
+				for(int i=0;i<columnNames.length;i++){
+					fila[i]=clientes.getObject(columnNames[i]);
+				}
+				model.addRow(fila);
+			}
+		} catch (SQLException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		columnBorrar=columnNames.length-1;
+		columnActualizar=columnNames.length-2;
 	}
 }
