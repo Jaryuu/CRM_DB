@@ -10,8 +10,13 @@ import conexion.Conexion;
 public class ControladorCliente {
 	
 	public static void main(String[] args){
-		//addCampo("hola","int");
-		deleteCampo("hola");
+		Object blah = new ArrayList();
+		if(blah instanceof ArrayList){
+			System.out.println("true");
+		}
+		else{
+			System.out.println("false");
+		}
 	}
 	
 	public static ResultSet getAllClientes(){
@@ -44,6 +49,7 @@ public class ControladorCliente {
 			}
 			query+=values.get(i);
 		}
+		query+=")";
 		return Conexion.executeUpdate(query);
 	}
 	

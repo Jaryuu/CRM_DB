@@ -1,6 +1,7 @@
 package conexion;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Desktop.Action;
 import java.awt.Dimension;
 import java.awt.EventQueue;
@@ -27,6 +28,11 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 
+import modelos.Aseguradora;
+import modelos.Carro;
+import modelos.Empresa;
+import modelos.Pais;
+import controladores.ControladorCatalogo;
 import controladores.ControladorCliente;
 
 import java.awt.event.ActionListener;
@@ -42,7 +48,7 @@ public class GUI extends JFrame {
 	private Object[][] data; 
 	private ArrayList<String> tiposCols;
 	private JButton btnCrearCliente, btnAgregarCampo;
-	private ArrayList<JTextField> jtfCamposPopUp;
+	private ArrayList valCamposPopUp;
 	private ArrayList<JLabel> lblCamposPopUp;
 	private DefaultTableModel model;
 	private int columnBorrar, columnActualizar;
@@ -59,12 +65,12 @@ public class GUI extends JFrame {
 	 * Create the frame.
 	 */
 	public GUI() {
+		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 553, 478);
 		contentPane = new JPanel();
 		contentPane.setLayout(new BorderLayout(0, 0));
 		setContentPane(contentPane);
-		
 		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
 		contentPane.add(tabbedPane, BorderLayout.CENTER);
 		
@@ -88,7 +94,7 @@ public class GUI extends JFrame {
 		
 		jspUsuarios = new JScrollPane(jtbUsuarios, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		//inicializando la tabla
-		llenarTabla();
+		llenarTabla(ControladorCliente.getAllClientes());
 		// Boton borrar
 		delete = new AbstractAction()
 		{
@@ -96,7 +102,10 @@ public class GUI extends JFrame {
 		    {
 		        JTable table = (JTable)e.getSource();
 		        int modelRow = Integer.valueOf( e.getActionCommand() );
+		        String nit = ""+table.getModel().getValueAt(modelRow, 0);
 		        ((DefaultTableModel)table.getModel()).removeRow(modelRow);
+		        ControladorCliente.deleteCliente(nit);
+		        
 		    }
 		};	
 		
@@ -108,7 +117,15 @@ public class GUI extends JFrame {
 		        JTable table = (JTable)e.getSource();
 		        int modelRow = Integer.valueOf( e.getActionCommand() );
 		        String nit = ""+table.getModel().getValueAt(modelRow, 0);
+		        ArrayList<String[]> datosN=new ArrayList<String[]>();
+		        for(int i=0;i<table.getModel().getColumnCount();i++){
+		        	String[] fila= new String[2];
+		        	fila[0]=table.getModel().getColumnName(i);
+		        	fila[1]=String.valueOf(table.getModel().getValueAt(modelRow, i));
+		        	datosN.add(fila);
+		        }
 		        //System.out.println(nit);
+		        ControladorCliente.updateCliente(nit, datosN);
 		    }
 		};
 				
@@ -175,12 +192,21 @@ public class GUI extends JFrame {
 			public void actionPerformed(ActionEvent arg0) {
 				// Funcion para aplicar filtros
 				ArrayList<String[]> filtros = new ArrayList<String[]>();
-				for (int x=0; x<jtfCamposPopUp.size(); x++){
-					JTextField actual = jtfCamposPopUp.get(x);
+				for (int x=0; x<valCamposPopUp.size(); x++){
+					Object actual = valCamposPopUp.get(x);
 					String[] unFiltro = new String[2];
-					if (! actual.getText().equals("")){
+					String actualText="";
+					if(actual instanceof JComboBox){
+						JComboBox box=(JComboBox)actual;
+						actualText=String.valueOf(box.getSelectedItem());
+					}
+					else{
+						JTextField text=(JTextField)actual;
+						actualText=text.getText();
+					}
+					if (! actualText.equals("")){
 						unFiltro[0] = lblCamposPopUp.get(x).getText();
-						unFiltro[1] = actual.getText();
+						unFiltro[1] = actualText;
 						filtros.add(unFiltro);
 					}										
 				}
@@ -188,6 +214,7 @@ public class GUI extends JFrame {
 //				for (int x=0; x<filtros.size(); x++){
 //					System.out.println(filtros.get(x)[0]+ " : "+filtros.get(x)[1]);
 //				}
+				llenarTabla(ControladorCliente.getFilteredClientes(filtros));
 			}
 		});	
 		ocultarFiltros();	
@@ -198,16 +225,54 @@ public class GUI extends JFrame {
 		pnlFiltros.removeAll();
 		pnlFiltros.setPreferredSize(new Dimension(300, pnlFiltros.getHeight()));
 		pnlFiltros.setLayout(new GridLayout(0,2));
-		jtfCamposPopUp = new ArrayList<JTextField>();
+		valCamposPopUp = new ArrayList();
 		lblCamposPopUp = new ArrayList<JLabel>();
 		for (int x=0; x<columnNames.length; x++){			
 			String campo = columnNames[x];			
 			if (! campo.equals("")){
 				lblCamposPopUp.add(new JLabel(columnNames[x]+":"));
-				jtfCamposPopUp.add(new JTextField());
+				if(campo.equals("idPais".toLowerCase())){
+					ArrayList<Pais> paises= ControladorCatalogo.findAllPaises();
+					String[] tipos = new String[paises.size()+1];
+					tipos[0]="";
+					for(int i=0;i<paises.size();i++){
+						tipos[i+1]=paises.get(i).getId()+"";
+					}
+					valCamposPopUp.add(new JComboBox(tipos));
+				}
+				else if(campo.equals("modeloCarro".toLowerCase())){
+					ArrayList<Carro> carros= ControladorCatalogo.findAllCarros();
+					String[] tipos = new String[carros.size()+1];
+					tipos[0]="";
+					for(int i=0;i<carros.size();i++){
+						tipos[i+1]=carros.get(i).getModelo()+"";
+					}
+					valCamposPopUp.add(new JComboBox(tipos));
+				}
+				else if(campo.equals("idEmpresa".toLowerCase())){
+					ArrayList<Empresa> empresas= ControladorCatalogo.findAllEmpresas();
+					String[] tipos = new String[empresas.size()+1];
+					tipos[0]="";
+					for(int i=0;i<empresas.size();i++){
+						tipos[i+1]=empresas.get(i).getId()+"";
+					}
+					valCamposPopUp.add(new JComboBox(tipos));
+				}
+				else if(campo.equals("idAseguradora".toLowerCase())){
+					ArrayList<Aseguradora> aseguradoras= ControladorCatalogo.findAllAseguradoras();
+					String[] tipos = new String[aseguradoras.size()+1];
+					tipos[0]="";
+					for(int i=0;i<aseguradoras.size();i++){
+						tipos[i+1]=aseguradoras.get(i).getId()+"";
+					}
+					valCamposPopUp.add(new JComboBox(tipos));
+				}
+				else{
+					valCamposPopUp.add(new JTextField());
+				}
 				pnlFiltros.add(lblCamposPopUp.get(x));
-				pnlFiltros.add(jtfCamposPopUp.get(x));
-			}			
+				pnlFiltros.add((Component) valCamposPopUp.get(x));
+			}
 		}				
 		pnlFiltros.add(btnOcultarFiltros);
 		pnlFiltros.add(btnFiltrar);
@@ -225,27 +290,71 @@ public class GUI extends JFrame {
 	private void crearPopUpCrearCliente(){
 		// Pop-up del form para crear un cliente
 		JPanel pnlPopUp = new JPanel(new GridLayout(0, 1));
-		jtfCamposPopUp = new ArrayList<JTextField>();
+		valCamposPopUp = new ArrayList<JTextField>();
 		lblCamposPopUp = new ArrayList<JLabel>();
 		for (int x=0; x<columnNames.length; x++){			
 			String campo = columnNames[x];			
 			if (! campo.equals("")){
 				lblCamposPopUp.add(new JLabel(columnNames[x]+":"));
-				jtfCamposPopUp.add(new JTextField());
+				if(campo.equals("idPais".toLowerCase())){
+					ArrayList<Pais> paises= ControladorCatalogo.findAllPaises();
+					String[] tipos = new String[paises.size()];
+					for(int i=0;i<paises.size();i++){
+						tipos[i]=paises.get(i).getId()+"";
+					}
+					valCamposPopUp.add(new JComboBox(tipos));
+				}
+				else if(campo.equals("modeloCarro".toLowerCase())){
+					ArrayList<Carro> carros= ControladorCatalogo.findAllCarros();
+					String[] tipos = new String[carros.size()];
+					for(int i=0;i<carros.size();i++){
+						tipos[i]=carros.get(i).getModelo()+"";
+					}
+					valCamposPopUp.add(new JComboBox(tipos));
+				}
+				else if(campo.equals("idEmpresa".toLowerCase())){
+					ArrayList<Empresa> empresas= ControladorCatalogo.findAllEmpresas();
+					String[] tipos = new String[empresas.size()];
+					for(int i=0;i<empresas.size();i++){
+						tipos[i]=empresas.get(i).getId()+"";
+					}
+					valCamposPopUp.add(new JComboBox(tipos));
+				}
+				else if(campo.equals("idAseguradora".toLowerCase())){
+					ArrayList<Aseguradora> aseguradoras= ControladorCatalogo.findAllAseguradoras();
+					String[] tipos = new String[aseguradoras.size()];
+					for(int i=0;i<aseguradoras.size();i++){
+						tipos[i]=aseguradoras.get(i).getId()+"";
+					}
+					valCamposPopUp.add(new JComboBox(tipos));
+				}
+				else{
+					valCamposPopUp.add(new JTextField());
+				}
 				pnlPopUp.add(lblCamposPopUp.get(x));
-				pnlPopUp.add(jtfCamposPopUp.get(x));
+				pnlPopUp.add((Component) valCamposPopUp.get(x));
 			}			
 		}
 		int result = JOptionPane.showConfirmDialog(null, pnlPopUp, "Crear Cliente",
 	            JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 		if (result == JOptionPane.OK_OPTION) {
 			ArrayList<String> datos = new ArrayList<String>();
-            for (int x=0; x<jtfCamposPopUp.size(); x++){
+            for (int x=0; x<valCamposPopUp.size(); x++){
             	// System.out.println(jtfCamposPopUp.get(x).getText());
-            	datos.add(jtfCamposPopUp.get(x).getText());            	          	            
+            	Object actual = valCamposPopUp.get(x);
+            	String add="";
+            	if(actual instanceof JComboBox){
+            		JComboBox box=(JComboBox)actual;
+            		add=String.valueOf(box.getSelectedItem());
+            	}
+            	else{
+            		JTextField text=(JTextField)actual;
+            		add=text.getText();
+            	}
+            	datos.add(add);            	          	            
             }
          // Datos es el arraylist para mandar  
-                    
+            ControladorCliente.insertCliente(datos);
         // Le agregamos lo campos para los botones
         datos.add("Actualizar");
         datos.add("Borrar");
@@ -285,9 +394,10 @@ public class GUI extends JFrame {
 		int result = JOptionPane.showConfirmDialog(null, jspPopUpAgrCol, "Agregar Campo",
 	            JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 		if (result == JOptionPane.OK_OPTION) {
-            //model.addColumn(jtfColNombre.getText());
-			//ControladorCliente.addCampo(jtfColNombre.getText(), jcbTipos.getSelectedItem().toString());
-            agregarColumna(jtfColNombre.getText());
+            //model.addColumn(jtfColNombre.getText(),columnNames.length-3);
+			ControladorCliente.addCampo(jtfColNombre.getText(), jcbTipos.getSelectedItem().toString());
+            //agregarColumna(jtfColNombre.getText());
+			llenarTabla(ControladorCliente.getAllClientes());
         } else {
             System.out.println("Cancelled");
         }
@@ -304,8 +414,14 @@ public class GUI extends JFrame {
 		temp[temp.length-1] = "";		
 		columnNames = temp;		
 	}
-	private void llenarTabla(){
-		clientes=ControladorCliente.getAllClientes();
+	private void llenarTabla(ResultSet clientes){
+		this.clientes=clientes;
+		columnNames = new String[]{};
+		columnBorrar=columnNames.length-1;
+		columnActualizar=columnNames.length-2;
+		data = new Object[][]{};
+		model = new DefaultTableModel(data, columnNames);
+		jtbUsuarios.setModel(model);
 		//crear campos
 		ResultSetMetaData metadata=null;
 		try {
@@ -326,7 +442,7 @@ public class GUI extends JFrame {
 			columnBorrar = tamano-1;
 			while(clientes.next()){				
 				Object[] fila = new Object[columnNames.length];
-				for(int i=0;i<tamano;i++){
+				for(int i=0;i<tamanoMD;i++){
 					fila[i]=clientes.getObject(columnNames[i]);
 				}
 				fila[columnActualizar] = "Actualizar";
