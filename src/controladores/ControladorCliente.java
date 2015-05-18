@@ -6,6 +6,9 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 import conexion.Conexion;
+import conexion.MongoDBController;
+import conexion.TwitterController;
+
 
 public class ControladorCliente {
 	
@@ -50,6 +53,17 @@ public class ControladorCliente {
 			query+=values.get(i);
 		}
 		query+=")";
+		
+		MongoDBController mongo = new MongoDBController("CRM");
+		mongo.setCollection("Cliente");
+		TwitterController twitter = new TwitterController("cf5fLMuGEIW8vZmHzhsXJLocx",
+															"Rk9Wgc8wJRcNAjBdDe02V5EpePOctZbXlTgIczlTNgmqgp8702",
+															"783415302-y3DwvNRfWIBM0AtjTuv93QpvhulDjlbmy37pX0b0",
+															"suvmZ44xdgfJrUkRCWn7VvhwerEuUCvjPXrSaWqvbuWsk");
+		ArrayList<String> tweets = twitter.searchTweets("game of thrones", 15);
+		
+		mongo.insert(Integer.parseInt(values.get(0)),tweets);
+		
 		return Conexion.executeUpdate(query);
 	}
 	

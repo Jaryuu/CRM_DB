@@ -230,7 +230,7 @@ public class GUI extends JFrame {
 		for (int x=0; x<columnNames.length; x++){			
 			String campo = columnNames[x];			
 			if (! campo.equals("")){
-				lblCamposPopUp.add(new JLabel(columnNames[x]+":"));
+				lblCamposPopUp.add(new JLabel(columnNames[x]+""));
 				if(campo.equals("idPais".toLowerCase())){
 					ArrayList<Pais> paises= ControladorCatalogo.findAllPaises();
 					String[] tipos = new String[paises.size()+1];
