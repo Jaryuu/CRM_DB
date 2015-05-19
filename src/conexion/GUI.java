@@ -7,16 +7,22 @@ import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
+import java.awt.Image;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
+import java.nio.file.Files;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -36,6 +42,10 @@ import controladores.ControladorCatalogo;
 import controladores.ControladorCliente;
 
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.IOException;
+
+import static java.nio.file.StandardCopyOption.*;
 
 public class GUI extends JFrame {
 
@@ -55,10 +65,14 @@ public class GUI extends JFrame {
 	private JButton btnMostrarFiltros, btnOcultarFiltros, btnFiltrar;
 	private ResultSet clientes;
 	private JScrollPane jspFiltros;
+	private JFileChooser chooser;
+	private String nCarpetaImagenes;
 	// Para Pop-Up de crear columna
 	private JLabel lblColTipo, lblColNombre;
 	private JComboBox jcbTipos;
 	private JTextField jtfColNombre;	
+	
+	
 	
 
 	/**
@@ -75,6 +89,8 @@ public class GUI extends JFrame {
 		contentPane.add(tabbedPane, BorderLayout.CENTER);
 		
 		// Panel para editar clientes -------------------------------------------------------------------------------------------------------------
+		chooser = new JFileChooser();
+		nCarpetaImagenes = "images";
 		pnlEditarUsuario = new JPanel();
 		tabbedPane.addTab("Editar Clientes", null, pnlEditarUsuario, null);
 		pnlEditarUsuario.setLayout(new BorderLayout(0, 0));
@@ -288,11 +304,16 @@ public class GUI extends JFrame {
 	}
 	
 	private void crearPopUpCrearCliente(){
-		// Pop-up del form para crear un cliente
-		JPanel pnlPopUp = new JPanel(new GridLayout(0, 1));
+		// Pop-up del form para crear un cliente	
+		final JTextField jtfFoto = new JTextField();
+		final String[] pathNombre = new String[1];
+		JPanel pnlPadre = new JPanel();
+		JPanel pnlPopUp = new JPanel(new GridLayout(0, 1));		
+		JButton cargar = new JButton("Cargar");		
 		valCamposPopUp = new ArrayList<JTextField>();
-		lblCamposPopUp = new ArrayList<JLabel>();
-		for (int x=0; x<columnNames.length; x++){			
+		lblCamposPopUp = new ArrayList<JLabel>();		
+		for (int x=0; x<columnNames.length; x++){
+			boolean agrFoto = false;
 			String campo = columnNames[x];			
 			if (! campo.equals("")){
 				lblCamposPopUp.add(new JLabel(columnNames[x]+":"));
@@ -328,16 +349,48 @@ public class GUI extends JFrame {
 					}
 					valCamposPopUp.add(new JComboBox(tipos));
 				}
+				else if (campo.equals("foto")){					
+					valCamposPopUp.add(jtfFoto);
+					// Funcion para cargar image
+					ActionListener cargarImagen = new ActionListener()
+			        {
+			            public void actionPerformed(ActionEvent e)
+			            {
+			            	chooser.showOpenDialog(null);
+			                File fileImg = chooser.getSelectedFile();
+			            	try {
+			                    Image img=ImageIO.read(fileImg);
+			                    ImageIcon icon=new ImageIcon(img); // ADDED
+			                    jtfFoto.setText(fileImg.getName());
+			                    //System.out.println(System.getProperty("user.dir")+"\\"+nCarpetaImagenes+"\\"+file.getName());
+			                    pathNombre[0] = fileImg.getAbsolutePath();
+			                    //pathNombre[1] = fileImg.getName();
+			                }
+			                catch(IOException e1) {}
+			            }
+			        };
+					cargar.addActionListener(cargarImagen);
+					agrFoto = true;
+				}
 				else{
 					valCamposPopUp.add(new JTextField());
 				}
 				pnlPopUp.add(lblCamposPopUp.get(x));
 				pnlPopUp.add((Component) valCamposPopUp.get(x));
+				if (agrFoto){
+					pnlPopUp.add(cargar);
+				}
 			}			
 		}
-		int result = JOptionPane.showConfirmDialog(null, pnlPopUp, "Crear Cliente",
+		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+		//double width = screenSize.getWidth();
+		double height = screenSize.getHeight();
+		JScrollPane jspPopUp = new JScrollPane(pnlPopUp);
+		jspPopUp.setPreferredSize(new Dimension(0, (int) height-150));
+		//pnlPadre.add(jspPopUp);
+		int result = JOptionPane.showConfirmDialog(null, jspPopUp, "Crear Cliente",
 	            JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
-		if (result == JOptionPane.OK_OPTION) {
+		if (result == JOptionPane.OK_OPTION) {			
 			ArrayList<String> datos = new ArrayList<String>();
             for (int x=0; x<valCamposPopUp.size(); x++){
             	// System.out.println(jtfCamposPopUp.get(x).getText());
@@ -349,10 +402,35 @@ public class GUI extends JFrame {
             	}
             	else{
             		JTextField text=(JTextField)actual;
-            		add=text.getText();
+            		if (x<tiposCols.size()){
+            			if (tiposCols.get(x).equals("varchar") || tiposCols.get(x).equals("date")){
+            				add="'"+text.getText()+"'";
+            			}else{
+            				add = text.getText();
+            			}
+            		}else{
+            			add = text.getText();
+            		}
+            		if (columnNames[x].equals("foto")){
+            			String path = pathNombre[0];
+            			if (path != null && !path.equals("")){
+            				File imagen = new File(path);
+            				File destino = new File(System.getProperty("user.dir")+"\\"+nCarpetaImagenes+"\\"+text.getText());
+            				try{
+            					Files.copy(imagen.toPath(), destino.toPath(), REPLACE_EXISTING);
+            				}catch(Exception e){
+            					
+            				}
+            				
+            			}
+            			
+            		}
             	}
             	datos.add(add);            	          	            
             }
+//          for (int x=0;x<datos.size();x++){
+//        	  System.out.println("-  "+datos.get(x));
+//          }
          // Datos es el arraylist para mandar  
             ControladorCliente.insertCliente(datos);
         // Le agregamos lo campos para los botones
@@ -425,9 +503,9 @@ public class GUI extends JFrame {
 		//crear campos
 		ResultSetMetaData metadata=null;
 		try {
-			metadata=clientes.getMetaData();
+			metadata=clientes.getMetaData();			
 			int tamanoMD =metadata.getColumnCount(); 
-			int tamano = tamanoMD+2;
+			int tamano = tamanoMD+2;			
 			columnNames=new String[tamano];
 			for(int i=0;i<tamano;i++){
 				if (i>=tamanoMD){
@@ -435,6 +513,8 @@ public class GUI extends JFrame {
 					columnNames[i] = "";
 				}else{
 					model.addColumn(metadata.getColumnName(i+1));
+					//System.out.println(typeNumToString(metadata.getColumnType(i+1)));
+					tiposCols.add(typeNumToString(metadata.getColumnType(i+1)));
 					columnNames[i]=metadata.getColumnName(i+1);
 				}				
 			}
@@ -456,5 +536,29 @@ public class GUI extends JFrame {
 		
 		columnBorrar=columnNames.length-1;
 		columnActualizar=columnNames.length-2;
+	}
+	
+	private String typeNumToString(int num){
+		String devolver = null;
+		switch (num){
+			case 0:
+				devolver = "null";
+				break;
+			case 1:
+				devolver = "char";
+			case 4:
+				devolver = "integer";
+				break;
+			case 7:
+				devolver = "real";
+				break;
+			case 12:
+				devolver = "varchar";
+				break;
+			case 91:
+				devolver = "date";
+				break;						
+		}
+		return devolver;
 	}
 }
