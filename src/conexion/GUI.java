@@ -6,6 +6,7 @@ import java.awt.Desktop.Action;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.FlowLayout;
+import java.awt.Graphics;
 import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.Toolkit;
@@ -19,6 +20,7 @@ import java.util.ArrayList;
 import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
+import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -30,6 +32,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
@@ -42,6 +45,7 @@ import controladores.ControladorCatalogo;
 import controladores.ControladorCliente;
 
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
@@ -102,10 +106,19 @@ public class GUI extends JFrame {
 		columnNames = new String[]{};
 		columnBorrar=columnNames.length-1;
 		columnActualizar=columnNames.length-2;
-		data = new Object[][]{};
+		data = new Object[][]{};		
 		model = new DefaultTableModel(data, columnNames);		
-		
-		jtbUsuarios = new JTable(model);
+		//jtbUsuarios = new JTable(model);
+		jtbUsuarios = new JTable( model )
+        {
+            //  Returning the Class of each column will allow different
+            //  renderers to be used based on Class
+            public Class getColumnClass(int column)
+            {            	            	
+                return getValueAt(0, column).getClass();
+            }
+        };               
+        jtbUsuarios.setPreferredScrollableViewportSize(jtbUsuarios.getPreferredSize());
 		jtbUsuarios.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 		
 		jspUsuarios = new JScrollPane(jtbUsuarios, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
@@ -115,12 +128,25 @@ public class GUI extends JFrame {
 		delete = new AbstractAction()
 		{
 		    public void actionPerformed(ActionEvent e)
-		    {
-		        JTable table = (JTable)e.getSource();
-		        int modelRow = Integer.valueOf( e.getActionCommand() );
-		        String nit = ""+table.getModel().getValueAt(modelRow, 0);
-		        ((DefaultTableModel)table.getModel()).removeRow(modelRow);
-		        ControladorCliente.deleteCliente(nit);
+		    {		    	
+		    	Object[] options = {"Sí",
+	                    "No"};
+		    	int dialogResult = JOptionPane.showOptionDialog(null,
+		    		    "Seguro que desea borrar el cliente?",
+		    		    "Cuidado!",
+		    		    JOptionPane.YES_NO_OPTION,
+		    		    JOptionPane.WARNING_MESSAGE,
+		    		    null,
+		    		    options,
+		    		    options[0]);
+		    	if(dialogResult == JOptionPane.YES_OPTION){
+		    		JTable table = (JTable)e.getSource();
+			        int modelRow = Integer.valueOf( e.getActionCommand() );
+			        String nit = ""+table.getModel().getValueAt(modelRow, 0);
+			        ((DefaultTableModel)table.getModel()).removeRow(modelRow);
+			        ControladorCliente.deleteCliente(nit);
+		    	}		    	
+		        
 		        
 		    }
 		};	
@@ -499,7 +525,7 @@ public class GUI extends JFrame {
 		columnActualizar=columnNames.length-2;
 		data = new Object[][]{};
 		model = new DefaultTableModel(data, columnNames);
-		jtbUsuarios.setModel(model);
+		jtbUsuarios.setModel(model);		
 		//crear campos
 		ResultSetMetaData metadata=null;
 		try {
@@ -519,21 +545,40 @@ public class GUI extends JFrame {
 				}				
 			}
 			columnActualizar = tamano-2;
-			columnBorrar = tamano-1;
+			columnBorrar = tamano-1;	
+			int numCol = 1;
 			while(clientes.next()){				
-				Object[] fila = new Object[columnNames.length];
+				Object[] fila = new Object[columnNames.length];				
 				for(int i=0;i<tamanoMD;i++){
-					fila[i]=clientes.getObject(columnNames[i]);
+					String tipoCol = tiposCols.get(i);
+					String nombreCol = columnNames[i];
+					if (nombreCol.equals("foto")){
+						numCol = i;						
+						try{
+							//System.out.println("-  "+clientes.getObject(nombreCol).toString());
+							ImageIcon icon = new ImageIcon("images\\"+clientes.getObject(nombreCol).toString());
+							Image img = icon.getImage();
+							Image newimg = img.getScaledInstance(50, 50,  java.awt.Image.SCALE_SMOOTH);
+							ImageIcon newIcon = new ImageIcon(newimg);
+							fila[i] = newIcon;							
+							//fila[i]=clientes.getObject(nombreCol).toString();
+						}catch(Exception e){
+							System.out.println("Error al abrir la imagen");
+						}						
+					}else{
+						fila[i]=clientes.getObject(columnNames[i]);
+					}
+					
 				}
 				fila[columnActualizar] = "Actualizar";
-				fila[columnBorrar] = "Borrar";				
+				fila[columnBorrar] = "Borrar";					
 				model.addRow(fila);
 			}
 			
 		} catch (SQLException e1) {
 			e1.printStackTrace();
 		}
-		
+		//jtbUsuarios.getColumnModel().getColumn(8).setCellRenderer(new ImageRenderer());
 		columnBorrar=columnNames.length-1;
 		columnActualizar=columnNames.length-2;
 	}
@@ -560,5 +605,5 @@ public class GUI extends JFrame {
 				break;						
 		}
 		return devolver;
-	}
+	}		
 }
