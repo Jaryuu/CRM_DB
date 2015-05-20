@@ -60,7 +60,7 @@ public class GUI extends JFrame {
 	private JPanel pnlEditarUsuario, pnlCrearUsuario, pnlBotonesCliente;
 	private JTable jtbUsuarios;
 	private JScrollPane jspUsuarios;
-	private AbstractAction delete, AAactualizar;	
+	private AbstractAction delete, AAactualizar, AAmostrarTweets;	
 	private String[] columnNames;
 	private Object[][] data; 
 	private ArrayList<String> tiposCols;
@@ -68,7 +68,7 @@ public class GUI extends JFrame {
 	private ArrayList valCamposPopUp;
 	private ArrayList<JLabel> lblCamposPopUp;
 	private DefaultTableModel model;
-	private int columnBorrar, columnActualizar;
+	private int columnBorrar, columnActualizar, columnMostrarT;
 	private JButton btnMostrarFiltros, btnOcultarFiltros, btnFiltrar;
 	private ResultSet clientes;
 	private JScrollPane jspFiltros;
@@ -112,6 +112,7 @@ public class GUI extends JFrame {
 		columnNames = new String[]{};
 		columnBorrar=columnNames.length-1;
 		columnActualizar=columnNames.length-2;
+		columnMostrarT = columnNames.length-3;
 		data = new Object[][]{};		
 		model = new DefaultTableModel(data, columnNames);		
 		jtbUsuarios = new JTable( model )
@@ -240,6 +241,20 @@ public class GUI extends JFrame {
 		        ControladorCliente.updateCliente(nit, datosN);
 		    }
 		};
+		
+		// Funcion de mostrar tweets
+		AAmostrarTweets = new AbstractAction()
+		{
+		    public void actionPerformed(ActionEvent e)
+		    {
+		        JTable table = (JTable)e.getSource();
+		        int modelRow = Integer.valueOf( e.getActionCommand() );
+		        String nit = ""+table.getModel().getValueAt(modelRow, 0);
+		        ArrayList tweets = new ArrayList<String>();
+		        tweets.add("prueba");
+		        crearPopUpTweets(nit, tweets);
+		    }
+		};
 				
 		ButtonColumn buttonBorrar = new ButtonColumn(jtbUsuarios, delete, columnBorrar);
 		jtbUsuarios.getColumnModel().getColumn(columnBorrar).setMaxWidth(100);
@@ -249,6 +264,11 @@ public class GUI extends JFrame {
 		ButtonColumn buttonActualizar = new ButtonColumn(jtbUsuarios, AAactualizar, columnActualizar);
 		jtbUsuarios.getColumnModel().getColumn(columnActualizar).setMinWidth(120);
 		jtbUsuarios.getColumnModel().getColumn(columnActualizar).setMaxWidth(120);
+		
+		// Boton de los tweets
+		ButtonColumn buttonTweets = new ButtonColumn(jtbUsuarios, AAmostrarTweets, columnMostrarT);
+		jtbUsuarios.getColumnModel().getColumn(columnMostrarT).setMaxWidth(100);
+		jtbUsuarios.setRowHeight(30);
 		
 		pnlEditarUsuario.add(jspUsuarios, BorderLayout.CENTER);		
 		
@@ -511,13 +531,6 @@ public class GUI extends JFrame {
             				if (!copia){
             					System.out.println("Error al copiar la imagen");
             				}
-//            				File imagen = new File(path);
-//            				File destino = new File(System.getProperty("user.dir")+"\\"+nCarpetaImagenes+"\\"+text.getText());
-//            				try{
-//            					Files.copy(imagen.toPath(), destino.toPath(), REPLACE_EXISTING);
-//            				}catch(Exception e){
-//            					
-//            				}
             				
             			}
             			
@@ -528,9 +541,11 @@ public class GUI extends JFrame {
 //          for (int x=0;x<datos.size();x++){
 //        	  System.out.println("-  "+datos.get(x));
 //          }
+            
          // Datos es el arraylist para mandar  
             ControladorCliente.insertCliente(datos);
         // Le agregamos lo campos para los botones
+        datos.add("Tweets");
         datos.add("Actualizar");
         datos.add("Borrar");
         model.addRow(datos.toArray());
@@ -543,7 +558,12 @@ public class GUI extends JFrame {
 		ButtonColumn buttonActualizar = new ButtonColumn(jtbUsuarios, AAactualizar, columnActualizar);
 		jtbUsuarios.getColumnModel().getColumn(columnActualizar).setMinWidth(120);
 		jtbUsuarios.getColumnModel().getColumn(columnActualizar).setMaxWidth(120);
-        
+		
+		// Boton de los tweets
+		ButtonColumn buttonTweets = new ButtonColumn(jtbUsuarios, AAmostrarTweets, columnBorrar);
+		jtbUsuarios.getColumnModel().getColumn(columnBorrar).setMaxWidth(100);
+		jtbUsuarios.setRowHeight(30);
+		
         } else {
             System.out.println("Cancelled");
         }
@@ -578,13 +598,35 @@ public class GUI extends JFrame {
         }
 	}
 	
+	private void crearPopUpTweets(String nit, ArrayList<String> tweets){
+		// Pop-up del form para crear un cliente	
+		JPanel pnlPopUp = new JPanel(new GridLayout(0, 1));
+		JLabel lblNit = new JLabel(nit);
+		pnlPopUp.add(lblNit);
+		
+		for (int x=0; x<tweets.size(); x++){
+			JTextField jtfTweet = new JTextField();
+			jtfTweet.setText(tweets.get(x));
+			pnlPopUp.add(jtfTweet);
+		}
+		
+		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+		//double width = screenSize.getWidth();
+		double height = screenSize.getHeight();
+		JScrollPane jspPopUp = new JScrollPane(pnlPopUp);
+		//jspPopUp.setPreferredSize(new Dimension(0, (int) height-150));
+		JOptionPane.showMessageDialog(null, jspPopUp, "Tweets",
+				JOptionPane.INFORMATION_MESSAGE);		
+	}
+	
 	// Este metodo agrega una columna antes de los botones
 	private void agregarColumna(String nombre){		
 		String [] temp = new String[columnNames.length+1];
 		for (int x=0; x<columnNames.length-2;x++){
 			temp[x] = columnNames[x];
 		}
-		temp[temp.length-3] = nombre;
+		temp[temp.length-4] = nombre;
+		temp[temp.length-3] = "";
 		temp[temp.length-2] = "";
 		temp[temp.length-1] = "";		
 		columnNames = temp;		
@@ -602,7 +644,7 @@ public class GUI extends JFrame {
 		try {
 			metadata=clientes.getMetaData();			
 			int tamanoMD =metadata.getColumnCount(); 
-			int tamano = tamanoMD+2;			
+			int tamano = tamanoMD+3;			
 			columnNames=new String[tamano];
 			for(int i=0;i<tamano;i++){
 				if (i>=tamanoMD){
@@ -615,6 +657,7 @@ public class GUI extends JFrame {
 					columnNames[i]=metadata.getColumnName(i+1);
 				}				
 			}
+			columnMostrarT = tamano-3;
 			columnActualizar = tamano-2;
 			columnBorrar = tamano-1;	
 			int numCol = 1;
@@ -643,6 +686,7 @@ public class GUI extends JFrame {
 					}
 					
 				}
+				fila[columnMostrarT] = "Tweets";
 				fila[columnActualizar] = "Actualizar";
 				fila[columnBorrar] = "Borrar";					
 				model.addRow(fila);
@@ -650,10 +694,10 @@ public class GUI extends JFrame {
 			
 		} catch (SQLException e1) {
 			e1.printStackTrace();
-		}
-		//jtbUsuarios.getColumnModel().getColumn(8).setCellRenderer(new ImageRenderer());
+		}		
 		columnBorrar=columnNames.length-1;
 		columnActualizar=columnNames.length-2;
+		columnMostrarT = columnNames.length-3;
 	}
 	
 	private String typeNumToString(int num){
