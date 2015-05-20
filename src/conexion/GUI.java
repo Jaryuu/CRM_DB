@@ -75,7 +75,7 @@ public class GUI extends JFrame {
 	private JFileChooser chooser;
 	private String nCarpetaImagenes;
 	private ListSelectionListener fotoListener;
-	private ArrayList<String> pathsFotos;
+	private ArrayList<File> fFotos;
 	// Para Pop-Up de crear columna
 	private JLabel lblColTipo, lblColNombre;
 	private JComboBox jcbTipos;
@@ -99,7 +99,7 @@ public class GUI extends JFrame {
 		
 		// Panel para editar clientes -------------------------------------------------------------------------------------------------------------
 		chooser = new JFileChooser();
-		pathsFotos = new ArrayList<String>();
+		fFotos = new ArrayList<File>();
 		nCarpetaImagenes = "images";
 		pnlEditarUsuario = new JPanel();
 		tabbedPane.addTab("Editar Clientes", null, pnlEditarUsuario, null);
@@ -156,7 +156,7 @@ public class GUI extends JFrame {
 				        	ImageIcon icon = fileAImagen(imgFile);
 				        	if (icon != null){
 				        		ImageIcon newIcon = resizeImage(icon, 50, 50);
-				        		pathsFotos.set(row, imgFile.getName());
+				        		fFotos.set(row, imgFile);
 				        		model.setValueAt(newIcon, row, column);
 				        	}else{
 				        		System.out.println("Error al cambiar la imagen");
@@ -219,7 +219,12 @@ public class GUI extends JFrame {
 		        	String[] fila= new String[2];
 		        	fila[0]=table.getModel().getColumnName(i);		        	       			           
 		        	if (fila[0].equals("foto")){		        		
-		        		fila[1]=pathsFotos.get(modelRow);
+		        		fila[1]=fFotos.get(modelRow).getName();
+		        		// Se tiene que copiar la imagen
+		        		boolean copia = copiarArchivo(fFotos.get(modelRow).getAbsolutePath(), System.getProperty("user.dir")+"\\"+nCarpetaImagenes+"\\"+fila[1]);
+		        		if (!copia){
+		        			System.out.println("Hubo un error al actualizar la foto");
+		        		}
 		        	}else{
 		        		fila[1]=String.valueOf(table.getModel().getValueAt(modelRow, i));
 		        	}	
@@ -502,13 +507,17 @@ public class GUI extends JFrame {
             		if (columnNames[x].equals("foto")){
             			String path = pathNombre[0];
             			if (path != null && !path.equals("")){
-            				File imagen = new File(path);
-            				File destino = new File(System.getProperty("user.dir")+"\\"+nCarpetaImagenes+"\\"+text.getText());
-            				try{
-            					Files.copy(imagen.toPath(), destino.toPath(), REPLACE_EXISTING);
-            				}catch(Exception e){
-            					
+            				boolean copia = copiarArchivo(path, System.getProperty("user.dir")+"\\"+nCarpetaImagenes+"\\"+text.getText());
+            				if (!copia){
+            					System.out.println("Error al copiar la imagen");
             				}
+//            				File imagen = new File(path);
+//            				File destino = new File(System.getProperty("user.dir")+"\\"+nCarpetaImagenes+"\\"+text.getText());
+//            				try{
+//            					Files.copy(imagen.toPath(), destino.toPath(), REPLACE_EXISTING);
+//            				}catch(Exception e){
+//            					
+//            				}
             				
             			}
             			
@@ -609,7 +618,7 @@ public class GUI extends JFrame {
 			columnActualizar = tamano-2;
 			columnBorrar = tamano-1;	
 			int numCol = 1;
-			pathsFotos.clear();
+			fFotos.clear();
 			while(clientes.next()){				
 				Object[] fila = new Object[columnNames.length];				
 				for(int i=0;i<tamanoMD;i++){
@@ -621,7 +630,7 @@ public class GUI extends JFrame {
 							//System.out.println("-  "+clientes.getObject(nombreCol).toString());
 							String nombreF = clientes.getObject(nombreCol).toString();
 							String pathFoto = nCarpetaImagenes+"\\"+nombreF;
-							pathsFotos.add(nombreF);
+							fFotos.add(new File(pathFoto));
 							ImageIcon icon = new ImageIcon(pathFoto);							
 							ImageIcon newIcon = resizeImage(icon, 50, 50);
 							fila[i] = newIcon;							
@@ -700,5 +709,16 @@ public class GUI extends JFrame {
 		Image img = icon.getImage();
 		Image newimg = img.getScaledInstance(50, 50,  java.awt.Image.SCALE_SMOOTH);
 		return new ImageIcon(newimg);
+	}
+	
+	private boolean copiarArchivo(String fileOrigen, String fileDestino){
+			File imagen = new File(fileOrigen);
+			File destino = new File(fileDestino);
+			try{
+				Files.copy(imagen.toPath(), destino.toPath(), REPLACE_EXISTING);
+				return true;
+			}catch(Exception e){
+				return false;
+			}			
 	}
 }
