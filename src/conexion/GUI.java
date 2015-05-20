@@ -31,7 +31,10 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
+import javax.swing.ListSelectionModel;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.JTabbedPane;
@@ -71,6 +74,8 @@ public class GUI extends JFrame {
 	private JScrollPane jspFiltros;
 	private JFileChooser chooser;
 	private String nCarpetaImagenes;
+	private ListSelectionListener fotoListener;
+	private ArrayList<String> pathsFotos;
 	// Para Pop-Up de crear columna
 	private JLabel lblColTipo, lblColNombre;
 	private JComboBox jcbTipos;
@@ -94,6 +99,7 @@ public class GUI extends JFrame {
 		
 		// Panel para editar clientes -------------------------------------------------------------------------------------------------------------
 		chooser = new JFileChooser();
+		pathsFotos = new ArrayList<String>();
 		nCarpetaImagenes = "images";
 		pnlEditarUsuario = new JPanel();
 		tabbedPane.addTab("Editar Clientes", null, pnlEditarUsuario, null);
@@ -108,7 +114,6 @@ public class GUI extends JFrame {
 		columnActualizar=columnNames.length-2;
 		data = new Object[][]{};		
 		model = new DefaultTableModel(data, columnNames);		
-		//jtbUsuarios = new JTable(model);
 		jtbUsuarios = new JTable( model )
         {
             //  Returning the Class of each column will allow different
@@ -121,6 +126,56 @@ public class GUI extends JFrame {
         jtbUsuarios.setPreferredScrollableViewportSize(jtbUsuarios.getPreferredSize());
 		jtbUsuarios.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 		
+		// Para crear el listener de cambiar imagen		
+	    fotoListener = new ListSelectionListener() {
+		      public void valueChanged(ListSelectionEvent e) {
+		    	  if (e.getValueIsAdjusting()){
+		    		  String selectedData = null;
+
+				        int[] selectedRow = jtbUsuarios.getSelectedRows();
+				        int[] selectedColumns = jtbUsuarios.getSelectedColumns();
+				        int row = selectedRow[0];
+				        int column = selectedColumns[0];
+				        int indexFoto = -1;
+				        for (int j=0; j<columnNames.length; j++){
+				        	if (columnNames[j].equals("foto")){
+				        		indexFoto = j;
+				        		break;
+				        	}
+				        }
+				        boolean eligioFoto = false;			       
+				        for (int j=0; j<selectedColumns.length; j++){
+				        	if (selectedColumns[j] == indexFoto){
+				        		eligioFoto = true;
+				        	}
+				        }
+				        			        
+				        if (eligioFoto){
+				        	System.out.println("foto");
+				        	File imgFile = mostrarChooser();
+				        	ImageIcon icon = fileAImagen(imgFile);
+				        	if (icon != null){
+				        		ImageIcon newIcon = resizeImage(icon, 50, 50);
+				        		pathsFotos.set(row, imgFile.getName());
+				        		model.setValueAt(newIcon, row, column);
+				        	}else{
+				        		System.out.println("Error al cambiar la imagen");
+				        	}
+				        	
+				        }
+		    	  }
+			        
+//			        for (int i = 0; i < selectedRow.length; i++) {
+//			          for (int j = 0; j < selectedColumns.length; j++) {
+//			            selectedData = ""+ jtbUsuarios.getValueAt(selectedRow[i], selectedColumns[j]);
+//			          }
+//			        }
+//			        System.out.println("Selected: " + selectedData);
+		      }
+
+	    };	    
+	    agregarFotoListener();
+	    
 		jspUsuarios = new JScrollPane(jtbUsuarios, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		//inicializando la tabla
 		llenarTabla(ControladorCliente.getAllClientes());
@@ -160,10 +215,20 @@ public class GUI extends JFrame {
 		        int modelRow = Integer.valueOf( e.getActionCommand() );
 		        String nit = ""+table.getModel().getValueAt(modelRow, 0);
 		        ArrayList<String[]> datosN=new ArrayList<String[]>();
-		        for(int i=0;i<table.getModel().getColumnCount();i++){
+		        for(int i=0;i<table.getModel().getColumnCount()-2;i++){		        
 		        	String[] fila= new String[2];
-		        	fila[0]=table.getModel().getColumnName(i);
-		        	fila[1]=String.valueOf(table.getModel().getValueAt(modelRow, i));
+		        	fila[0]=table.getModel().getColumnName(i);		        	       			           
+		        	if (fila[0].equals("foto")){		        		
+		        		fila[1]=pathsFotos.get(modelRow);
+		        	}else{
+		        		fila[1]=String.valueOf(table.getModel().getValueAt(modelRow, i));
+		        	}	
+		        	if (i<tiposCols.size()){
+		        		String tipo = tiposCols.get(i); 		        	
+			        	if (tipo.equals("varchar") || tipo.equals("date")){
+	        				fila[1]="'"+fila[1]+"'";
+	        			}
+		        	}		        	
 		        	datosN.add(fila);
 		        }
 		        //System.out.println(nit);
@@ -382,17 +447,14 @@ public class GUI extends JFrame {
 			        {
 			            public void actionPerformed(ActionEvent e)
 			            {
-			            	chooser.showOpenDialog(null);
-			                File fileImg = chooser.getSelectedFile();
-			            	try {
-			                    Image img=ImageIO.read(fileImg);
-			                    ImageIcon icon=new ImageIcon(img); // ADDED
-			                    jtfFoto.setText(fileImg.getName());
-			                    //System.out.println(System.getProperty("user.dir")+"\\"+nCarpetaImagenes+"\\"+file.getName());
+			            	File fileImg = mostrarChooser();
+			            	ImageIcon icon = fileAImagen(fileImg);
+			            	if (icon != null){
+			            		jtfFoto.setText(fileImg.getName());
 			                    pathNombre[0] = fileImg.getAbsolutePath();
-			                    //pathNombre[1] = fileImg.getName();
-			                }
-			                catch(IOException e1) {}
+			            	}else{
+			            		System.out.println("Error al cargar la imagen");
+			            	}			            	
 			            }
 			        };
 					cargar.addActionListener(cargarImagen);
@@ -547,6 +609,7 @@ public class GUI extends JFrame {
 			columnActualizar = tamano-2;
 			columnBorrar = tamano-1;	
 			int numCol = 1;
+			pathsFotos.clear();
 			while(clientes.next()){				
 				Object[] fila = new Object[columnNames.length];				
 				for(int i=0;i<tamanoMD;i++){
@@ -556,10 +619,11 @@ public class GUI extends JFrame {
 						numCol = i;						
 						try{
 							//System.out.println("-  "+clientes.getObject(nombreCol).toString());
-							ImageIcon icon = new ImageIcon("images\\"+clientes.getObject(nombreCol).toString());
-							Image img = icon.getImage();
-							Image newimg = img.getScaledInstance(50, 50,  java.awt.Image.SCALE_SMOOTH);
-							ImageIcon newIcon = new ImageIcon(newimg);
+							String nombreF = clientes.getObject(nombreCol).toString();
+							String pathFoto = nCarpetaImagenes+"\\"+nombreF;
+							pathsFotos.add(nombreF);
+							ImageIcon icon = new ImageIcon(pathFoto);							
+							ImageIcon newIcon = resizeImage(icon, 50, 50);
 							fila[i] = newIcon;							
 							//fila[i]=clientes.getObject(nombreCol).toString();
 						}catch(Exception e){
@@ -606,4 +670,35 @@ public class GUI extends JFrame {
 		}
 		return devolver;
 	}		
+	
+	private void agregarFotoListener(){
+		jtbUsuarios.setCellSelectionEnabled(true);
+	    ListSelectionModel cellSelectionModel = jtbUsuarios.getSelectionModel();
+	    cellSelectionModel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+	    //cellSelectionModel.removeListSelectionListener(null);
+	    cellSelectionModel.addListSelectionListener(fotoListener);
+	}
+	
+	private File mostrarChooser(){
+		chooser.showOpenDialog(null);
+        File fileImg = chooser.getSelectedFile();
+        return fileImg;
+    	
+	}
+	
+	private ImageIcon fileAImagen(File fileImg){
+		try {
+            Image img=ImageIO.read(fileImg);
+            ImageIcon icon=new ImageIcon(img); // ADDED
+            return icon;
+        }
+        catch(IOException e1) {}
+		return null;
+	}
+	
+	private ImageIcon resizeImage(ImageIcon icon, int width, int height){
+		Image img = icon.getImage();
+		Image newimg = img.getScaledInstance(50, 50,  java.awt.Image.SCALE_SMOOTH);
+		return new ImageIcon(newimg);
+	}
 }
