@@ -135,8 +135,7 @@ public class GUI extends JFrame {
 
 				        int[] selectedRow = jtbUsuarios.getSelectedRows();
 				        int[] selectedColumns = jtbUsuarios.getSelectedColumns();
-				        int row = selectedRow[0];
-				        int column = selectedColumns[0];
+				        
 				        int indexFoto = -1;
 				        for (int j=0; j<columnNames.length; j++){
 				        	if (columnNames[j].equals("foto")){
@@ -150,6 +149,16 @@ public class GUI extends JFrame {
 				        		eligioFoto = true;
 				        	}
 				        }
+				        
+				        int row = -1;
+				        int column = -1;
+				        if (selectedRow.length>0 && selectedColumns.length>0){
+				        	row = selectedRow[0];
+					        column = selectedColumns[0];
+					        
+				        }else{
+				        	eligioFoto = false;
+				        }				        				        
 				        			        
 				        if (eligioFoto){
 				        	System.out.println("foto");
@@ -158,11 +167,11 @@ public class GUI extends JFrame {
 				        	if (icon != null){
 				        		ImageIcon newIcon = resizeImage(icon, 50, 50);
 				        		fFotos.set(row, imgFile);
-				        		model.setValueAt(newIcon, row, column);
+				        		model.setValueAt(newIcon, row, column);				        		
 				        	}else{
 				        		System.out.println("Error al cambiar la imagen");
 				        	}
-				        	
+				        	jtbUsuarios.clearSelection();
 				        }
 		    	  }
 			        
@@ -216,7 +225,7 @@ public class GUI extends JFrame {
 		        int modelRow = Integer.valueOf( e.getActionCommand() );
 		        String nit = ""+table.getModel().getValueAt(modelRow, 0);
 		        ArrayList<String[]> datosN=new ArrayList<String[]>();
-		        for(int i=0;i<table.getModel().getColumnCount()-2;i++){		        
+		        for(int i=0;i<table.getModel().getColumnCount()-3;i++){		        
 		        	String[] fila= new String[2];
 		        	fila[0]=table.getModel().getColumnName(i);		        	       			           
 		        	if (fila[0].equals("foto")){		        		
@@ -733,7 +742,7 @@ public class GUI extends JFrame {
 	}
 	
 	private File mostrarChooser(){
-		chooser.showOpenDialog(null);
+		chooser.showOpenDialog(null);		
         File fileImg = chooser.getSelectedFile();
         return fileImg;
     	
@@ -741,9 +750,11 @@ public class GUI extends JFrame {
 	
 	private ImageIcon fileAImagen(File fileImg){
 		try {
-            Image img=ImageIO.read(fileImg);
-            ImageIcon icon=new ImageIcon(img); // ADDED
-            return icon;
+			if (fileImg!=null){
+				Image img=ImageIO.read(fileImg);
+	            ImageIcon icon=new ImageIcon(img); // ADDED
+	            return icon;
+			}           
         }
         catch(IOException e1) {}
 		return null;
