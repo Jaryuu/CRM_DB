@@ -16,10 +16,12 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Vector;
 
 import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
+import javax.swing.DefaultCellEditor;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -37,6 +39,8 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableColumn;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 
@@ -76,6 +80,9 @@ public class GUI extends JFrame {
 	private String nCarpetaImagenes;
 	private ListSelectionListener fotoListener;
 	private ArrayList<File> fFotos;
+	private JComboBox jcbPais, jcbCarro, jcbEmpresa, jcbAseguradora;
+	private int columnPais, columnCarro, columnEmpresa, columnAseguradora;
+	private String[] lPais, lCarro, lEmpresa, lAseguradora;
 	// Para Pop-Up de crear columna
 	private JLabel lblColTipo, lblColNombre;
 	private JComboBox jcbTipos;
@@ -100,6 +107,9 @@ public class GUI extends JFrame {
 		// Panel para editar clientes -------------------------------------------------------------------------------------------------------------
 		chooser = new JFileChooser();
 		fFotos = new ArrayList<File>();
+		// Para los combobox
+		
+		
 		nCarpetaImagenes = "images";
 		pnlEditarUsuario = new JPanel();
 		tabbedPane.addTab("Editar Clientes", null, pnlEditarUsuario, null);
@@ -123,7 +133,8 @@ public class GUI extends JFrame {
             {            	            	
                 return getValueAt(0, column).getClass();
             }
-        };               
+        };    
+        
         jtbUsuarios.setPreferredScrollableViewportSize(jtbUsuarios.getPreferredSize());
 		jtbUsuarios.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 		
@@ -552,12 +563,15 @@ public class GUI extends JFrame {
 //          }
             
          // Datos es el arraylist para mandar  
-            ControladorCliente.insertCliente(datos);
+        ControladorCliente.insertCliente(datos);
         // Le agregamos lo campos para los botones
         datos.add("Tweets");
         datos.add("Actualizar");
         datos.add("Borrar");
-        model.addRow(datos.toArray());
+        
+      //inicializando la tabla
+        llenarTabla(ControladorCliente.getAllClientes());	
+        //model.addRow(datos.toArray());
         
         ButtonColumn buttonBorrar = new ButtonColumn(jtbUsuarios, delete, columnBorrar);
 		jtbUsuarios.getColumnModel().getColumn(columnBorrar).setMaxWidth(100);
@@ -572,6 +586,9 @@ public class GUI extends JFrame {
 		ButtonColumn buttonTweets = new ButtonColumn(jtbUsuarios, AAmostrarTweets, columnBorrar);
 		jtbUsuarios.getColumnModel().getColumn(columnBorrar).setMaxWidth(100);
 		jtbUsuarios.setRowHeight(30);
+		
+		pnlEditarUsuario.repaint();
+		pnlEditarUsuario.revalidate();		
 		
         } else {
             System.out.println("Cancelled");
@@ -647,6 +664,12 @@ public class GUI extends JFrame {
 		columnActualizar=columnNames.length-2;
 		data = new Object[][]{};
 		model = new DefaultTableModel(data, columnNames);
+		// ComboBoxes para catalogos
+		jcbPais = new JComboBox();
+		jcbCarro = new JComboBox();
+		jcbEmpresa = new JComboBox();
+		jcbAseguradora = new JComboBox();
+		
 		jtbUsuarios.setModel(model);		
 		//crear campos
 		ResultSetMetaData metadata=null;
@@ -664,8 +687,67 @@ public class GUI extends JFrame {
 					//System.out.println(typeNumToString(metadata.getColumnType(i+1)));
 					tiposCols.add(typeNumToString(metadata.getColumnType(i+1)));
 					columnNames[i]=metadata.getColumnName(i+1);
+					if (columnNames[i].equals("idpais")){
+						columnPais = i;
+					}else if (columnNames[i].equals("modelocarro")){
+						columnCarro = i;
+					}else if (columnNames[i].equals("idempresa")){
+						columnEmpresa = i;
+					}else if (columnNames[i].equals("idaseguradora")){
+						columnAseguradora = i;
+					}
 				}				
 			}
+			// Para los combobox
+			// Pais
+			ArrayList<Pais> paises= ControladorCatalogo.findAllPaises();
+			lPais = new String[paises.size()];
+			for(int i=0;i<paises.size();i++){
+				lPais[i]=paises.get(i).getId()+"";
+			}
+			jcbPais = new JComboBox(lPais);
+			TableColumn paisColumn = jtbUsuarios.getColumnModel().getColumn(columnPais);
+			paisColumn.setCellEditor(new DefaultCellEditor(jcbPais));
+			DefaultTableCellRenderer rendererPais =
+		                new DefaultTableCellRenderer();
+			paisColumn.setCellRenderer(rendererPais);
+			// Carro
+			ArrayList<Carro> carros= ControladorCatalogo.findAllCarros();
+			lCarro = new String[carros.size()];
+			for(int i=0;i<carros.size();i++){
+				lCarro[i]=carros.get(i).getModelo()+"";
+			}
+			jcbCarro = new JComboBox(lCarro);
+			TableColumn carroColumn = jtbUsuarios.getColumnModel().getColumn(columnCarro);
+			carroColumn.setCellEditor(new DefaultCellEditor(jcbCarro));
+			DefaultTableCellRenderer rendererCarro =
+		                new DefaultTableCellRenderer();
+			carroColumn.setCellRenderer(rendererCarro);
+			// Empresa
+			ArrayList<Empresa> empresaes= ControladorCatalogo.findAllEmpresas();
+			lEmpresa = new String[empresaes.size()];
+			for(int i=0;i<empresaes.size();i++){
+				lEmpresa[i]=empresaes.get(i).getId()+"";
+			}
+			jcbEmpresa = new JComboBox(lEmpresa);
+			TableColumn empresaColumn = jtbUsuarios.getColumnModel().getColumn(columnEmpresa);
+			empresaColumn.setCellEditor(new DefaultCellEditor(jcbEmpresa));
+			DefaultTableCellRenderer rendererEmpresa =
+		                new DefaultTableCellRenderer();
+			empresaColumn.setCellRenderer(rendererEmpresa);
+			// Aseguradora
+			ArrayList<Aseguradora> aseguradoraes= ControladorCatalogo.findAllAseguradoras();
+			lAseguradora = new String[aseguradoraes.size()];
+			for(int i=0;i<aseguradoraes.size();i++){
+				lAseguradora[i]=aseguradoraes.get(i).getId()+"";
+			}
+			jcbAseguradora = new JComboBox(lAseguradora);
+			TableColumn aseguradoraColumn = jtbUsuarios.getColumnModel().getColumn(columnAseguradora);
+			aseguradoraColumn.setCellEditor(new DefaultCellEditor(jcbAseguradora));
+			DefaultTableCellRenderer rendererAseguradora =
+		                new DefaultTableCellRenderer();
+			aseguradoraColumn.setCellRenderer(rendererAseguradora);
+			
 			columnMostrarT = tamano-3;
 			columnActualizar = tamano-2;
 			columnBorrar = tamano-1;	
@@ -691,7 +773,9 @@ public class GUI extends JFrame {
 							System.out.println("Error al abrir la imagen");
 						}						
 					}else{
+						String agregar = "" +clientes.getObject(columnNames[i]);
 						fila[i]=clientes.getObject(columnNames[i]);
+						
 					}
 					
 				}
@@ -703,7 +787,7 @@ public class GUI extends JFrame {
 			
 		} catch (SQLException e1) {
 			e1.printStackTrace();
-		}		
+		}				
 		columnBorrar=columnNames.length-1;
 		columnActualizar=columnNames.length-2;
 		columnMostrarT = columnNames.length-3;
@@ -776,4 +860,30 @@ public class GUI extends JFrame {
 				return false;
 			}			
 	}
+	
+	// Para el combo box
+	class MyComboBoxRenderer extends JComboBox implements TableCellRenderer {
+		  public MyComboBoxRenderer(String[] items) {
+		    super(items);
+		  }
+
+		  public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
+		      boolean hasFocus, int row, int column) {
+		    if (isSelected) {
+		      //setForeground(table.getSelectionForeground());
+		      super.setBackground(table.getSelectionBackground());
+		    } else {
+		      setForeground(table.getForeground());
+		      setBackground(table.getBackground());
+		    }
+		    setSelectedItem(value);
+		    return this;
+		  }
+		}
+
+		class MyComboBoxEditor extends DefaultCellEditor {
+		  public MyComboBoxEditor(String[] items) {
+		    super(new JComboBox(items));
+		  }
+		}
 }
