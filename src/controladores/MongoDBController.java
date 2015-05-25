@@ -86,13 +86,22 @@ public class MongoDBController {
 	
 	public void update(int oldNit, int newNit){
 		BasicDBObject updateQuery = new BasicDBObject();
-		updateQuery.append("$set", 
+		updateQuery.append("$set",
 			new BasicDBObject().append("nit", newNit));
 	 
 		BasicDBObject searchQuery = new BasicDBObject();
 		searchQuery.append("nit", oldNit);
 	 
 		collection.updateMulti(searchQuery, updateQuery);			
+	}
+	
+	public void delete(int nit){
+		
+		BasicDBObject searchQuery = new BasicDBObject();
+		searchQuery.append("nit", nit);
+	 
+		collection.remove(searchQuery);
+		find(nit);
 	}
 	
 	

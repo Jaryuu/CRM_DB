@@ -100,6 +100,17 @@ public class ControladorCliente {
 		String query="DELETE FROM cliente WHERE nit = "+nit;
 		int st=Conexion.executeUpdate(query);
 		System.out.println("query: "+query);
+		
+		MongoDBController mongo = new MongoDBController("CRM");
+		mongo.setCollection("Cliente");
+		
+		try{
+			mongo.delete(Integer.parseInt(nit));
+		}
+		catch(Exception e){
+			System.out.println(e);
+		}
+		
 		return st;
 	}
 	

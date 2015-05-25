@@ -289,7 +289,7 @@ public class GUI extends JFrame {
 		jtbUsuarios.getColumnModel().getColumn(columnMostrarT).setMaxWidth(100);
 		jtbUsuarios.setRowHeight(30);
 		
-		pnlEditarUsuario.add(jspUsuarios, BorderLayout.CENTER);		
+		pnlEditarUsuario.add(jspUsuarios, BorderLayout.CENTER);	
 		
 		// Paneles para los creak client 
 		pnlCrearUsuario = new JPanel();
