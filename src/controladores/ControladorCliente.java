@@ -6,8 +6,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 import conexion.Conexion;
-import conexion.MongoDBController;
-import conexion.TwitterController;
 
 
 public class ControladorCliente {
@@ -81,6 +79,20 @@ public class ControladorCliente {
 		query+=" WHERE nit = "+nit;
 		int st=Conexion.executeUpdate(query);
 		System.out.println("query: "+query);
+		
+		//Actualizar en mongo
+		MongoDBController mongo = new MongoDBController("CRM");
+		mongo.setCollection("Cliente");
+		
+		try{
+			mongo.update(Integer.parseInt(nit), Integer.parseInt(values.get(0)[1]));
+		}
+		catch(Exception e){
+			System.out.println(e);
+		}
+		
+		
+		
 		return st;
 	}
 	
@@ -102,5 +114,18 @@ public class ControladorCliente {
 		boolean res=Conexion.execute(query);
 		System.out.println(query);
 		return res;
+	}
+	
+	public static ArrayList<String> getTweets(int nit){
+		MongoDBController mongo = new MongoDBController("CRM");
+		mongo.setCollection("Cliente");
+		ArrayList<String> results = new ArrayList<String>();
+		try{
+			results = mongo.find(nit);
+		}
+		catch(Exception e){
+			System.out.println(e);
+		}
+		return results;
 	}
 }

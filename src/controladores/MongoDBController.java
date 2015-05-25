@@ -1,4 +1,4 @@
-package conexion;
+package controladores;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.BulkWriteOperation;
@@ -67,6 +67,7 @@ public class MongoDBController {
 	}
 	
 	public ArrayList<String> find(int nit){
+		System.out.println(nit);
 		ArrayList<String> result = new ArrayList<String>();
 		BasicDBObject query = new BasicDBObject("nit",nit);
 		DBCursor cursor = collection.find(query);
@@ -74,13 +75,24 @@ public class MongoDBController {
 		   while(cursor.hasNext()) {
 			   DBObject obj = cursor.next();
 		       result.add((String) obj.get("tweet"));
-			   System.out.println(nit+" : "+(String) obj.get("tweet"));
+//			   System.out.println(nit+" : "+(String) obj.get("tweet"));
 		   }
 		} 
 		finally {
 		   cursor.close();
 		}
 		return result;
+	}
+	
+	public void update(int oldNit, int newNit){
+		BasicDBObject updateQuery = new BasicDBObject();
+		updateQuery.append("$set", 
+			new BasicDBObject().append("nit", newNit));
+	 
+		BasicDBObject searchQuery = new BasicDBObject();
+		searchQuery.append("nit", oldNit);
+	 
+		collection.updateMulti(searchQuery, updateQuery);			
 	}
 	
 	

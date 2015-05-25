@@ -270,8 +270,7 @@ public class GUI extends JFrame {
 		        JTable table = (JTable)e.getSource();
 		        int modelRow = Integer.valueOf( e.getActionCommand() );
 		        String nit = ""+table.getModel().getValueAt(modelRow, 0);
-		        ArrayList tweets = new ArrayList<String>();
-		        tweets.add("prueba");
+		        ArrayList tweets = ControladorCliente.getTweets(Integer.parseInt(nit));
 		        crearPopUpTweets(nit, tweets);
 		    }
 		};

@@ -1,4 +1,4 @@
-package conexion;
+package controladores;
 
 import java.util.ArrayList;
 
@@ -39,7 +39,7 @@ public class TwitterController{
 			for (Status status : result.getTweets()) {
 //		        System.out.println("@" + status.getUser().getScreenName() + ":" + status.getText());
 		        tweets.add(status.getText());
-		        System.out.println(status.getText());
+//		        System.out.println(status.getText());
 		    }
 		} catch (TwitterException e) {
 			// TODO Auto-generated catch block
