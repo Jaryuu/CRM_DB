@@ -32,6 +32,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.border.EmptyBorder;
@@ -625,21 +626,25 @@ public class GUI extends JFrame {
 	
 	private void crearPopUpTweets(String nit, ArrayList<String> tweets){
 		// Pop-up del form para crear un cliente	
-		JPanel pnlPopUp = new JPanel(new GridLayout(0, 1));
+		//JPanel pnlPopUp = new JPanel(new GridLayout(0, 1));
+		JPanel pnlPopUp = new JPanel(new BorderLayout());
 		JLabel lblNit = new JLabel(nit);
-		pnlPopUp.add(lblNit);
-		
+		pnlPopUp.add(lblNit, BorderLayout.NORTH);
+		String tweetsStr = "";
 		for (int x=0; x<tweets.size(); x++){
-			JTextField jtfTweet = new JTextField();
-			jtfTweet.setText(tweets.get(x));
-			pnlPopUp.add(jtfTweet);
+			tweetsStr += ""+x+". "+tweets.get(x)+"\n---\n";
 		}
-		
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-		//double width = screenSize.getWidth();
+		double width = screenSize.getWidth();
 		double height = screenSize.getHeight();
-		JScrollPane jspPopUp = new JScrollPane(pnlPopUp);
-		jspPopUp.setPreferredSize(new Dimension(0, (int) height-150));
+		
+		JTextArea jtaTweet = new JTextArea();
+		jtaTweet.setText(tweetsStr);	
+		JScrollPane jsp = new JScrollPane(jtaTweet);
+		//jsp.setPreferredSize(new Dimension(500, (int) height-200));
+		jsp.setMaximumSize(new Dimension((int) width-100, 0)); 
+		pnlPopUp.add(jsp, BorderLayout.CENTER);		
+		JScrollPane jspPopUp = new JScrollPane(pnlPopUp);		
 		JOptionPane.showMessageDialog(null, jspPopUp, "Tweets",
 				JOptionPane.INFORMATION_MESSAGE);		
 	}
