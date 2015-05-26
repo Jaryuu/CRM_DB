@@ -548,7 +548,7 @@ public class GUI extends JFrame {
             			if (path != null && !path.equals("")){
             				boolean copia = copiarArchivo(path, System.getProperty("user.dir")+"\\"+nCarpetaImagenes+"\\"+text.getText());
             				if (!copia){
-            					System.out.println("Error al copiar la imagen");
+            					System.out.println("Error al copiar la imagen");            					
             				}
             				
             			}
@@ -582,8 +582,8 @@ public class GUI extends JFrame {
 		jtbUsuarios.getColumnModel().getColumn(columnActualizar).setMaxWidth(120);
 		
 		// Boton de los tweets
-		ButtonColumn buttonTweets = new ButtonColumn(jtbUsuarios, AAmostrarTweets, columnBorrar);
-		jtbUsuarios.getColumnModel().getColumn(columnBorrar).setMaxWidth(100);
+		ButtonColumn buttonTweets = new ButtonColumn(jtbUsuarios, AAmostrarTweets, columnMostrarT);
+		jtbUsuarios.getColumnModel().getColumn(columnMostrarT).setMaxWidth(100);
 		jtbUsuarios.setRowHeight(30);
 		
 		pnlEditarUsuario.repaint();
@@ -639,7 +639,7 @@ public class GUI extends JFrame {
 		//double width = screenSize.getWidth();
 		double height = screenSize.getHeight();
 		JScrollPane jspPopUp = new JScrollPane(pnlPopUp);
-		//jspPopUp.setPreferredSize(new Dimension(0, (int) height-150));
+		jspPopUp.setPreferredSize(new Dimension(0, (int) height-150));
 		JOptionPane.showMessageDialog(null, jspPopUp, "Tweets",
 				JOptionPane.INFORMATION_MESSAGE);		
 	}
