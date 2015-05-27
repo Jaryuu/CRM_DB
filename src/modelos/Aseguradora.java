@@ -36,5 +36,17 @@ public class Aseguradora {
 	public void setPrecio(float precio) {
 		this.precio = precio;
 	}
-	
+	public String getAtr(String atr){
+		switch(atr){
+			case "id":
+				return ""+id;
+			case "nombre":
+				return nombre;
+			case "descripcion":
+				return descripcion;
+			case "precio":
+				return ""+precio;
+		}
+		return "";
+	}
 }

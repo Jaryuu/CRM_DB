@@ -20,7 +20,6 @@ public class ControladorCatalogo {
 				res.add(new Aseguradora(queryRes.getInt("id"),queryRes.getString("nombre"),queryRes.getString("descripcion"),queryRes.getInt("precio")));
 			}
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return res;

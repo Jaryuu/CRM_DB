@@ -44,4 +44,18 @@ public class Empresa {
 		this.departamento = departamento;
 	}
 	
+	public String getAtr(String atr){
+		switch(atr){
+			case "nombre":
+				return nombre;
+			case "direccion":
+				return direccion;
+			case "pais":
+				return pais;
+			case "departamento":
+				return departamento;
+		}
+		return "";
+	}
+	
 }
