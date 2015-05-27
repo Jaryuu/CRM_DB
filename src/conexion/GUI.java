@@ -442,7 +442,7 @@ public class GUI extends JFrame {
 					String[] tipos = new String[paises.size()+1];
 					tipos[0]="";
 					for(int i=0;i<paises.size();i++){
-						tipos[i+1]=paises.get(i).getId()+"";
+						tipos[i+1]=paises.get(i).getNombre()+"";
 					}
 					valCamposPopUp.add(new JComboBox(tipos));
 				}
@@ -460,7 +460,7 @@ public class GUI extends JFrame {
 					String[] tipos = new String[empresas.size()+1];
 					tipos[0]="";
 					for(int i=0;i<empresas.size();i++){
-						tipos[i+1]=empresas.get(i).getId()+"";
+						tipos[i+1]=empresas.get(i).getNombre()+"";
 					}
 					valCamposPopUp.add(new JComboBox(tipos));
 				}
@@ -469,7 +469,7 @@ public class GUI extends JFrame {
 					String[] tipos = new String[aseguradoras.size()+1];
 					tipos[0]="";
 					for(int i=0;i<aseguradoras.size();i++){
-						tipos[i+1]=aseguradoras.get(i).getId()+"";
+						tipos[i+1]=aseguradoras.get(i).getNombre()+"";
 					}
 					valCamposPopUp.add(new JComboBox(tipos));
 				}
@@ -703,7 +703,7 @@ public class GUI extends JFrame {
 					ArrayList<Pais> paises= ControladorCatalogo.findAllPaises();
 					String[] tipos = new String[paises.size()];
 					for(int i=0;i<paises.size();i++){
-						tipos[i]=paises.get(i).getId()+"";
+						tipos[i]=paises.get(i).getNombre()+"";
 					}
 					valCamposPopUp.add(new JComboBox(tipos));
 				}
@@ -719,7 +719,7 @@ public class GUI extends JFrame {
 					ArrayList<Empresa> empresas= ControladorCatalogo.findAllEmpresas();
 					String[] tipos = new String[empresas.size()];
 					for(int i=0;i<empresas.size();i++){
-						tipos[i]=empresas.get(i).getId()+"";
+						tipos[i]=empresas.get(i).getNombre()+"";
 					}
 					valCamposPopUp.add(new JComboBox(tipos));
 				}
@@ -727,7 +727,7 @@ public class GUI extends JFrame {
 					ArrayList<Aseguradora> aseguradoras= ControladorCatalogo.findAllAseguradoras();
 					String[] tipos = new String[aseguradoras.size()];
 					for(int i=0;i<aseguradoras.size();i++){
-						tipos[i]=aseguradoras.get(i).getId()+"";
+						tipos[i]=aseguradoras.get(i).getNombre()+"";
 					}
 					valCamposPopUp.add(new JComboBox(tipos));
 				}
@@ -963,7 +963,7 @@ public class GUI extends JFrame {
 			ArrayList<Pais> paises= ControladorCatalogo.findAllPaises();
 			lPais = new String[paises.size()];
 			for(int i=0;i<paises.size();i++){
-				lPais[i]=paises.get(i).getId()+"";
+				lPais[i]=paises.get(i).getNombre()+"";
 			}
 			jcbPais = new JComboBox(lPais);
 			TableColumn paisColumn = jtbUsuarios.getColumnModel().getColumn(columnPais);
@@ -987,7 +987,7 @@ public class GUI extends JFrame {
 			ArrayList<Empresa> empresaes= ControladorCatalogo.findAllEmpresas();
 			lEmpresa = new String[empresaes.size()];
 			for(int i=0;i<empresaes.size();i++){
-				lEmpresa[i]=empresaes.get(i).getId()+"";
+				lEmpresa[i]=empresaes.get(i).getNombre()+"";
 			}
 			jcbEmpresa = new JComboBox(lEmpresa);
 			TableColumn empresaColumn = jtbUsuarios.getColumnModel().getColumn(columnEmpresa);
@@ -999,7 +999,7 @@ public class GUI extends JFrame {
 			ArrayList<Aseguradora> aseguradoraes= ControladorCatalogo.findAllAseguradoras();
 			lAseguradora = new String[aseguradoraes.size()];
 			for(int i=0;i<aseguradoraes.size();i++){
-				lAseguradora[i]=aseguradoraes.get(i).getId()+"";
+				lAseguradora[i]=aseguradoraes.get(i).getNombre()+"";
 			}
 			jcbAseguradora = new JComboBox(lAseguradora);
 			TableColumn aseguradoraColumn = jtbUsuarios.getColumnModel().getColumn(columnAseguradora);
@@ -1032,6 +1032,31 @@ public class GUI extends JFrame {
 						}catch(Exception e){
 							System.out.println("Error al abrir la imagen");
 						}						
+					}else if (nombreCol.equals("idpais")){
+						String agregar = "" +clientes.getObject(columnNames[i]);
+						for (Pais p : paises){
+							if(agregar.equals(p.getId()+"")){
+								fila[i]=p.getNombre();
+							}
+						}
+						
+						
+					}else if (nombreCol.equals("idempresa")){
+						String agregar = "" +clientes.getObject(columnNames[i]);
+						for (Empresa e : empresaes){
+							if(agregar.equals(e.getId()+"")){
+								fila[i]=e.getNombre();
+							}
+						}
+						
+					}else if (nombreCol.equals("idaseguradora")){
+						String agregar = "" +clientes.getObject(columnNames[i]);
+						for (Aseguradora a : aseguradoraes){
+							if(agregar.equals(a.getId()+"")){
+								fila[i]=a.getNombre();
+							}
+						}
+
 					}else{
 						String agregar = "" +clientes.getObject(columnNames[i]);
 						fila[i]=clientes.getObject(columnNames[i]);

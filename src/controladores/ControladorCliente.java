@@ -4,7 +4,11 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Random;
 
+import modelos.Aseguradora;
+import modelos.Empresa;
+import modelos.Pais;
 import conexion.Conexion;
 
 
@@ -29,6 +33,37 @@ public class ControladorCliente {
 		String query="SELECT * FROM cliente ";
 		for(int i=0;i<filtros.size();i++){
 			String[] actual=filtros.get(i);
+			
+			ArrayList<Pais> paises = ControladorCatalogo.findAllPaises();
+			ArrayList<Aseguradora> aseguradoras = ControladorCatalogo.findAllAseguradoras();
+			ArrayList<Empresa> empresas = ControladorCatalogo.findAllEmpresas();	
+
+
+			if(actual[0].equals("idpais")){
+				for (Pais p : paises){
+					if (actual[1].equals(p.getNombre())){
+						actual[1]=p.getId()+"";
+						break;
+					}
+				}
+			}
+			else if(actual[0].equals("idempresa")){
+				for (Empresa e : empresas){
+					if (actual[1].equals(e.getNombre())){
+						actual[1]=e.getId()+"";
+						break;
+					}
+				}
+			}
+			else if(actual[0].equals("idaseguradora")){
+				for (Aseguradora a : aseguradoras){	
+					if (actual[1].equals(a.getNombre())){
+						actual[1]=a.getId()+"";
+						break;
+					}
+				}
+			}
+			
 			if(i==0){
 				query+="WHERE "+actual[0]+" = "+actual[1];
 			}
@@ -45,6 +80,38 @@ public class ControladorCliente {
 	public static int insertCliente(ArrayList<String> values)throws Exception{
 		String query ="INSERT INTO cliente VALUES (";
 		for(int i=0;i<values.size();i++){
+			
+			ArrayList<Pais> paises = ControladorCatalogo.findAllPaises();
+			ArrayList<Aseguradora> aseguradoras = ControladorCatalogo.findAllAseguradoras();
+			ArrayList<Empresa> empresas = ControladorCatalogo.findAllEmpresas();	
+
+
+			if(i==11){
+				for (Pais p : paises){
+					if (values.get(i).equals(p.getNombre())){
+							values.set(i, p.getId()+"");
+							break;
+						}
+					}
+				}
+			else if(i==13){
+				for (Empresa e : empresas){
+					if (values.get(i).equals(e.getNombre())){
+						values.set(i, e.getId()+"");
+						break;
+					}
+				}
+			}
+			else if(i==14){
+				for (Aseguradora a : aseguradoras){	
+					if (values.get(i).equals(a.getNombre())){
+						values.set(i, a.getId()+"");
+						break;
+					}
+				}
+			}
+			
+			
 			if(i!=0){
 				query+=",";
 			}
@@ -58,7 +125,9 @@ public class ControladorCliente {
 															"Rk9Wgc8wJRcNAjBdDe02V5EpePOctZbXlTgIczlTNgmqgp8702",
 															"783415302-y3DwvNRfWIBM0AtjTuv93QpvhulDjlbmy37pX0b0",
 															"suvmZ44xdgfJrUkRCWn7VvhwerEuUCvjPXrSaWqvbuWsk");
-		ArrayList<String> tweets = twitter.searchTweets("game of thrones", 15);
+		Random ran = new Random();
+		String[] topics = {"#NoLeToca", "#RenunciaYa","Game of Thrones", "science"};
+		ArrayList<String> tweets = twitter.searchTweets(topics[ran.nextInt(3)], 15);
 		
 		mongo.insert(Integer.parseInt(values.get(0)),tweets);
 		
@@ -69,6 +138,36 @@ public class ControladorCliente {
 		String query="UPDATE cliente ";
 		for(int i=0;i<values.size();i++){
 			String[] actual=values.get(i);
+			
+			ArrayList<Pais> paises = ControladorCatalogo.findAllPaises();
+			ArrayList<Aseguradora> aseguradoras = ControladorCatalogo.findAllAseguradoras();
+			ArrayList<Empresa> empresas = ControladorCatalogo.findAllEmpresas();
+			
+			if(actual[0].equals("idpais")){
+				for (Pais p : paises){
+					if (actual[1].equals(p.getNombre())){
+						actual[1]=p.getId()+"";
+						break;
+					}
+				}
+			}
+			else if(actual[0].equals("idempresa")){
+				for (Empresa e : empresas){
+					if (actual[1].equals(e.getNombre())){
+						actual[1]=e.getId()+"";
+						break;
+					}
+				}
+			}
+			else if(actual[0].equals("idaseguradora")){
+				for (Aseguradora a : aseguradoras){	
+					if (actual[1].equals(a.getNombre())){
+						actual[1]=a.getId()+"";
+						break;
+					}
+				}
+			}
+			
 			if(i==0){
 				query+="SET "+actual[0]+" = "+actual[1];
 			}
