@@ -206,6 +206,7 @@ public class GUI extends JFrame {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 			//agregar pop up
+			JOptionPane.showMessageDialog(null,e1.getMessage() ,"alert", JOptionPane.ERROR_MESSAGE); 
 		}
 		// Boton borrar
 		delete = new AbstractAction()
@@ -233,6 +234,7 @@ public class GUI extends JFrame {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
 						//agregar pop up
+						JOptionPane.showMessageDialog(null,e1.getMessage() ,"alert", JOptionPane.ERROR_MESSAGE);
 					}
 		    	}		    	
 		        
@@ -277,6 +279,7 @@ public class GUI extends JFrame {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
 					//agregar pop up
+					JOptionPane.showMessageDialog(null,e1.getMessage() ,"alert", JOptionPane.ERROR_MESSAGE);
 				}
 		    }
 		};
@@ -299,6 +302,7 @@ public class GUI extends JFrame {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
 					//agregar pop up
+					JOptionPane.showMessageDialog(null,e1.getMessage() ,"alert", JOptionPane.ERROR_MESSAGE);
 				}
 		        crearPopUpTweets(nit, tweets);
 		    }
@@ -337,6 +341,7 @@ public class GUI extends JFrame {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 					//agregar pop up
+					JOptionPane.showMessageDialog(null,e.getMessage() ,"alert", JOptionPane.ERROR_MESSAGE);
 				}
 			}
 		});
@@ -369,7 +374,7 @@ public class GUI extends JFrame {
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
-					//agregar pop up
+					JOptionPane.showMessageDialog(null,e.getMessage() ,"alert", JOptionPane.ERROR_MESSAGE);
 				}
 			}
 		});
@@ -412,6 +417,7 @@ public class GUI extends JFrame {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 					//agregar pop up
+					JOptionPane.showMessageDialog(null,e.getMessage() ,"alert", JOptionPane.ERROR_MESSAGE);
 				}
 			}
 		});	
@@ -667,6 +673,7 @@ public class GUI extends JFrame {
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
+				JOptionPane.showMessageDialog(null,e.getMessage() ,"alert", JOptionPane.ERROR_MESSAGE);
 			}
             //agregarColumna(jtfColNombre.getText());
 			try {
@@ -674,6 +681,7 @@ public class GUI extends JFrame {
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
+				JOptionPane.showMessageDialog(null,e.getMessage() ,"alert", JOptionPane.ERROR_MESSAGE);
 			}
         } else {
             System.out.println("Cancelled");
