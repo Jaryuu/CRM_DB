@@ -139,7 +139,7 @@ public class GUI extends JFrame {
             //  Returning the Class of each column will allow different
             //  renderers to be used based on Class
             public Class getColumnClass(int column)
-            {            	            	
+            {                  	
                 return getValueAt(0, column).getClass();
             }
         };    
@@ -151,6 +151,7 @@ public class GUI extends JFrame {
 	    fotoListener = new ListSelectionListener() {
 		      public void valueChanged(ListSelectionEvent e) {
 		    	  if (e.getValueIsAdjusting()){
+		    		  System.out.println("listener");
 		    		  String selectedData = null;
 
 				        int[] selectedRow = jtbUsuarios.getSelectedRows();
@@ -190,9 +191,9 @@ public class GUI extends JFrame {
 				        		model.setValueAt(newIcon, row, column);				        		
 				        	}else{
 				        		System.out.println("Error al cambiar la imagen");
-				        	}
-				        	jtbUsuarios.clearSelection();
+				        	}				        	
 				        }
+				        jtbUsuarios.clearSelection();
 		    	  }
 		      }
 
@@ -295,10 +296,8 @@ public class GUI extends JFrame {
 				try {
 					tweets = ControladorCliente.getTweets(Integer.parseInt(nit));
 				} catch (NumberFormatException e1) {
-					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				} catch (Exception e1) {
-					// TODO Auto-generated catch block
 					e1.printStackTrace();
 					//agregar pop up
 					JOptionPane.showMessageDialog(null,e1.getMessage() ,"alert", JOptionPane.ERROR_MESSAGE);
@@ -536,7 +535,6 @@ public class GUI extends JFrame {
 		try{
 			switch (catalogo){
 				case "Pais":
-					// TODO	
 					String[] paisesCols = {"id", "nombre", "continente", "codarea"};
 					ArrayList<Pais> paises;
 					// Para paises	
@@ -867,7 +865,7 @@ public class GUI extends JFrame {
 			} catch (Exception e) {
 				e.printStackTrace();
 				JOptionPane.showMessageDialog(null,e.getMessage() ,"alert", JOptionPane.ERROR_MESSAGE);
-			}
+			}			
             //agregarColumna(jtfColNombre.getText());
 			try {
 				llenarTabla(ControladorCliente.getAllClientes());
@@ -908,7 +906,7 @@ public class GUI extends JFrame {
 	// Este metodo agrega una columna antes de los botones
 	private void agregarColumna(String nombre){		
 		String [] temp = new String[columnNames.length+1];
-		for (int x=0; x<columnNames.length-2;x++){
+		for (int x=0; x<columnNames.length-3;x++){
 			temp[x] = columnNames[x];
 		}
 		temp[temp.length-4] = nombre;
@@ -919,9 +917,11 @@ public class GUI extends JFrame {
 	}
 	private void llenarTabla(ResultSet clientes) throws Exception{
 		this.clientes=clientes;
+		tiposCols.clear();
 		columnNames = new String[]{};
 		columnBorrar=columnNames.length-1;
 		columnActualizar=columnNames.length-2;
+		columnMostrarT = columnNames.length-3;
 		data = new Object[][]{};
 		model = new DefaultTableModel(data, columnNames);
 		// ComboBoxes para catalogos
@@ -945,8 +945,9 @@ public class GUI extends JFrame {
 				}else{
 					model.addColumn(metadata.getColumnName(i+1));
 					//System.out.println(typeNumToString(metadata.getColumnType(i+1)));
-					tiposCols.add(typeNumToString(metadata.getColumnType(i+1)));
+					tiposCols.add(typeNumToString(metadata.getColumnType(i+1)));					
 					columnNames[i]=metadata.getColumnName(i+1);
+					System.out.println(columnNames[i]);
 					if (columnNames[i].equals("idpais")){
 						columnPais = i;
 					}else if (columnNames[i].equals("modelocarro")){
@@ -971,7 +972,7 @@ public class GUI extends JFrame {
 			DefaultTableCellRenderer rendererPais =
 		                new DefaultTableCellRenderer();
 			paisColumn.setCellRenderer(rendererPais);
-			// Carro
+			// Carro TODO
 			ArrayList<Carro> carros= ControladorCatalogo.findAllCarros();
 			lCarro = new String[carros.size()];
 			for(int i=0;i<carros.size();i++){
@@ -1059,14 +1060,20 @@ public class GUI extends JFrame {
 
 					}else{
 						String agregar = "" +clientes.getObject(columnNames[i]);
-						fila[i]=clientes.getObject(columnNames[i]);
-						
+						if (agregar.equals("null")){
+							agregar = "";
+						}
+						fila[i]=agregar;												
 					}
 					
 				}
+//				System.out.println("| "+columnMostrarT+" | "+columnActualizar+" | "+columnBorrar);
 				fila[columnMostrarT] = "Tweets";
 				fila[columnActualizar] = "Actualizar";
 				fila[columnBorrar] = "Borrar";					
+//				for (int x=0; x<fila.length; x++){
+//					System.out.println(fila[x]);
+//				}
 				model.addRow(fila);
 			}
 			
