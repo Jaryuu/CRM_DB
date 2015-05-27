@@ -37,4 +37,17 @@ public class Carro {
 		this.transmision = transmision;
 	}
 	
+	public String getAtr(String atr){
+		switch(atr){
+			case "modelo":
+				return ""+modelo;
+			case "marca":
+				return marca;
+			case "color":
+				return color;
+			case "transmision":
+				return transmision;
+		}
+		return "";
+	}
 }

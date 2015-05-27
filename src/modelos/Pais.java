@@ -1,5 +1,7 @@
 package modelos;
 
+import java.util.ArrayList;
+
 public class Pais {
 	private int id;
 	private String nombre;
@@ -37,4 +39,17 @@ public class Pais {
 		this.codarea = codarea;
 	}
 	
+	public String getAtr(String atr){
+		switch(atr){
+			case "id":
+				return ""+id;
+			case "nombre":
+				return nombre;
+			case "continente":
+				return continente;
+			case "codarea":
+				return ""+codarea;
+		}
+		return "";
+	}
 }

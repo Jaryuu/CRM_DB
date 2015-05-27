@@ -1,12 +1,16 @@
 package conexion;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Desktop.Action;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.Toolkit;
@@ -26,15 +30,19 @@ import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JSeparator;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingConstants;
+import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -74,7 +82,7 @@ public class GUI extends JFrame {
 	private ArrayList<JLabel> lblCamposPopUp;
 	private DefaultTableModel model;
 	private int columnBorrar, columnActualizar, columnMostrarT;
-	private JButton btnMostrarFiltros, btnOcultarFiltros, btnFiltrar;
+	private JButton btnMostrarFiltros, btnOcultarFiltros, btnFiltrar, btnCatalogos;
 	private ResultSet clientes;
 	private JScrollPane jspFiltros;
 	private JFileChooser chooser;
@@ -186,13 +194,6 @@ public class GUI extends JFrame {
 				        	jtbUsuarios.clearSelection();
 				        }
 		    	  }
-			        
-//			        for (int i = 0; i < selectedRow.length; i++) {
-//			          for (int j = 0; j < selectedColumns.length; j++) {
-//			            selectedData = ""+ jtbUsuarios.getValueAt(selectedRow[i], selectedColumns[j]);
-//			          }
-//			        }
-//			        System.out.println("Selected: " + selectedData);
 		      }
 
 	    };	    
@@ -203,7 +204,6 @@ public class GUI extends JFrame {
 		try {
 			llenarTabla(ControladorCliente.getAllClientes());
 		} catch (Exception e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 			//agregar pop up
 			JOptionPane.showMessageDialog(null,e1.getMessage() ,"alert", JOptionPane.ERROR_MESSAGE); 
@@ -276,7 +276,6 @@ public class GUI extends JFrame {
 		        try {
 					ControladorCliente.updateCliente(nit, datosN);
 				} catch (Exception e1) {
-					// TODO Auto-generated catch block
 					e1.printStackTrace();
 					//agregar pop up
 					JOptionPane.showMessageDialog(null,e1.getMessage() ,"alert", JOptionPane.ERROR_MESSAGE);
@@ -338,7 +337,6 @@ public class GUI extends JFrame {
 				try {
 					crearPopUpCrearCliente();
 				} catch (Exception e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 					//agregar pop up
 					JOptionPane.showMessageDialog(null,e.getMessage() ,"alert", JOptionPane.ERROR_MESSAGE);
@@ -362,22 +360,27 @@ public class GUI extends JFrame {
 		
 		// Panel para filtrar clientes que se muestran
 		pnlFiltros = new JPanel();
-		pnlFiltros.setBorder(BorderFactory.createTitledBorder("Filtros"));		
+		pnlFiltros.setBorder(BorderFactory.createTitledBorder("Más..."));		
 		jspFiltros = new JScrollPane(pnlFiltros);
 		pnlEditarUsuario.add(jspFiltros, BorderLayout.EAST);	
 		
-		btnMostrarFiltros = new JButton("Mostrar");
+		btnMostrarFiltros = new JButton("Filtros");
 		btnMostrarFiltros.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				try {
 					mostrarFiltros();
 				} catch (Exception e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 					JOptionPane.showMessageDialog(null,e.getMessage() ,"alert", JOptionPane.ERROR_MESSAGE);
 				}
 			}
 		});
+		btnCatalogos = new JButton("Catálogos");
+		btnCatalogos.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				crearPopUpCatalogos();		
+			}
+		});		
 		btnOcultarFiltros = new JButton("Ocultar");
 		btnOcultarFiltros.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -414,7 +417,6 @@ public class GUI extends JFrame {
 				try {
 					llenarTabla(ControladorCliente.getFilteredClientes(filtros));
 				} catch (Exception e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 					//agregar pop up
 					JOptionPane.showMessageDialog(null,e.getMessage() ,"alert", JOptionPane.ERROR_MESSAGE);
@@ -486,10 +488,202 @@ public class GUI extends JFrame {
 		pnlFiltros.removeAll();	
 		pnlFiltros.setLayout(new FlowLayout());
 		pnlFiltros.setPreferredSize(new Dimension(100, pnlFiltros.getHeight()));
+		pnlFiltros.add(btnCatalogos);
 		pnlFiltros.add(btnMostrarFiltros);
 		pnlEditarUsuario.repaint();
 		pnlEditarUsuario.revalidate();
 	}
+	
+	private void crearPopUpCatalogos(){	
+		JPanel pnlCatalogos = agregarCatalogo(new JPanel(),"");
+		pnlCatalogos.setPreferredSize(new Dimension(300, 300));
+//		JOptionPane pane = new JOptionPane(null, JOptionPane.INFORMATION_MESSAGE);
+//		pane.showMessageDialog(null, pnlCatalogos);
+		JOptionPane.showMessageDialog(null, pnlCatalogos, "Catálogos",
+				JOptionPane.CLOSED_OPTION);
+	}
+	
+	private JPanel agregarCatalogo(JPanel panel1, String catalogo){
+		String defaultFont = new JLabel().getFont().getName();
+		Font fontCatalogo = new Font(defaultFont, Font.BOLD, 14);
+		Font fontCol = new Font(defaultFont, Font.BOLD, 12);
+		Font fontDato = new Font(defaultFont, Font.PLAIN, 12);
+		panel1.removeAll();
+		JPanel[] lPanel = {panel1};
+		JPanel panel = lPanel[0];
+		panel.setLayout(new GridBagLayout());
+		String[] listaCatalogos = {"", "Pais", "Carro", "Empresa", "Aseguradora"};
+		JComboBox jcbCatalogos = new JComboBox(listaCatalogos);
+		jcbCatalogos.addActionListener (new ActionListener () {
+		    public void actionPerformed(ActionEvent e) {
+		    	lPanel[0]= agregarCatalogo(panel1,""+jcbCatalogos.getSelectedItem());	
+		    	lPanel[0].repaint();
+		    	lPanel[0].revalidate();
+		    	lPanel[0].getParent().repaint();
+		    	lPanel[0].getParent().revalidate();		    	
+		    	
+//		    	JOptionPane.showMessageDialog(null, lPanel[0], "Catálogos",
+//						JOptionPane.INFORMATION_MESSAGE);
+		    	
+		    }
+		});
+		GridBagConstraints c = new GridBagConstraints();
+		c.gridwidth = 2;			
+		c.gridx= 0;
+		c.gridy = 0;
+		int offset = 1;
+		panel.add(jcbCatalogos, c);		
+		try{
+			switch (catalogo){
+				case "Pais":
+					// TODO	
+					String[] paisesCols = {"id", "nombre", "continente", "codarea"};
+					ArrayList<Pais> paises;
+					// Para paises	
+					paises = ControladorCatalogo.findAllPaises();
+					JLabel paisesTitulo = new JLabel("Paises");															
+					paisesTitulo.setFont(fontCatalogo);
+					c.gridwidth = 2;			
+					c.gridx= 0;
+					c.gridy = 0;
+					panel.add(paisesTitulo, c);
+					c.fill = GridBagConstraints.HORIZONTAL;
+					for(int i=0;i<paises.size();i++){
+						c.gridwidth = 1;
+						for (int x = 0; x<paisesCols.length; x++){
+							c.gridy = offset;
+							c.gridx = 0;
+							String pCol = paisesCols[x];
+							JLabel paisesTemp = new JLabel(pCol+": ");	
+							paisesTemp.setFont(fontCol);
+							panel.add(paisesTemp, c);				
+							c.gridx = 1;
+							JLabel paisesDato = new JLabel(paises.get(i).getAtr(pCol));
+							paisesDato.setFont(fontDato);
+							panel.add(paisesDato, c);
+							offset++;
+						}	
+						JSeparator sep = new JSeparator(JSeparator.HORIZONTAL);
+						c.gridwidth = 2;
+						c.gridy = offset;
+						c.gridx = 0;
+						offset++;
+						panel.add(sep, c);
+					}
+					break;
+				case "Empresa":
+					// Para empresas	
+					String[] empresasCols = {"id", "nombre", "dirección", "pais", "departamento"};
+					ArrayList<Empresa> empresas;
+					empresas = ControladorCatalogo.findAllEmpresas();
+					JLabel empresasTitulo = new JLabel("Paises");			
+					empresasTitulo.setFont(fontCatalogo);
+					c.gridwidth = 2;			
+					c.gridx= 0;
+					c.gridy = 0;
+					panel.add(empresasTitulo, c);
+					c.fill = GridBagConstraints.HORIZONTAL;
+					for(int i=0;i<empresas.size();i++){
+						c.gridwidth = 1;
+						for (int x = 0; x<empresasCols.length; x++){
+							c.gridy = offset;
+							c.gridx = 0;
+							String pCol = empresasCols[x];
+							JLabel empresasTemp = new JLabel(pCol+": ");	
+							empresasTemp.setFont(fontCol);
+							panel.add(empresasTemp, c);				
+							c.gridx = 1;
+							JLabel empresasDato = new JLabel(empresas.get(i).getAtr(pCol));
+							empresasDato.setFont(fontDato);
+							panel.add(empresasDato, c);
+							offset++;
+						}	
+						JSeparator sep = new JSeparator(JSeparator.HORIZONTAL);
+						c.gridwidth = 2;
+						c.gridy = offset;
+						c.gridx = 0;
+						offset++;
+						panel.add(sep, c);
+					}
+					break;
+				case "Carro":
+					String[] carrosCols = {"modelo", "marca", "color", "transmisión"};
+					ArrayList<Carro> carros;
+					// Para carros	
+					carros = ControladorCatalogo.findAllCarros();
+					JLabel carrosTitulo = new JLabel("Paises");			
+					carrosTitulo.setFont(fontCatalogo);
+					c.gridwidth = 2;			
+					c.gridx= 0;
+					c.gridy = 0;
+					panel.add(carrosTitulo, c);
+					c.fill = GridBagConstraints.HORIZONTAL;
+					offset = 1;				
+					for(int i=0;i<carros.size();i++){
+						c.gridwidth = 1;
+						for (int x = 0; x<carrosCols.length; x++){
+							c.gridy = offset;
+							c.gridx = 0;
+							String pCol = carrosCols[x];
+							JLabel carrosTemp = new JLabel(pCol+": ");	
+							carrosTemp.setFont(fontCol);
+							panel.add(carrosTemp, c);				
+							c.gridx = 1;
+							JLabel carrosDato = new JLabel(carros.get(i).getAtr(pCol));
+							carrosDato.setFont(fontDato);
+							panel.add(carrosDato, c);
+							offset++;
+						}	
+						JSeparator sep = new JSeparator(JSeparator.HORIZONTAL);
+						c.gridwidth = 2;
+						c.gridy = offset;
+						c.gridx = 0;
+						offset++;
+						panel.add(sep, c);
+					}
+					break;
+				case "Aseguradora":
+					String[] aseguradorasCols = {"id", "nombre", "dirección", "precio"};
+					ArrayList<Aseguradora> aseguradoras;
+					// Para aseguradoras	
+					aseguradoras = ControladorCatalogo.findAllAseguradoras();
+					JLabel aseguradorasTitulo = new JLabel("Paises");			
+					aseguradorasTitulo.setFont(fontCatalogo);
+					c.gridwidth = 2;			
+					c.gridx= 0;
+					c.gridy = 0;
+					panel.add(aseguradorasTitulo, c);
+					c.fill = GridBagConstraints.HORIZONTAL;
+					offset = 1;				
+					for(int i=0;i<aseguradoras.size();i++){
+						c.gridwidth = 1;
+						for (int x = 0; x<aseguradorasCols.length; x++){
+							c.gridy = offset;
+							c.gridx = 0;
+							String pCol = aseguradorasCols[x];
+							JLabel aseguradorasTemp = new JLabel(pCol+": ");	
+							aseguradorasTemp.setFont(fontCol);
+							panel.add(aseguradorasTemp, c);				
+							c.gridx = 1;
+							JLabel aseguradorasDato = new JLabel(aseguradoras.get(i).getAtr(pCol));
+							aseguradorasDato.setFont(fontDato);
+							panel.add(aseguradorasDato, c);
+							offset++;
+						}	
+						JSeparator sep = new JSeparator(JSeparator.HORIZONTAL);
+						c.gridwidth = 2;
+						c.gridy = offset;
+						c.gridx = 0;
+						offset++;
+						panel.add(sep, c);
+					}
+					break;
+					
+			}
+		} catch (Exception e){}
+		return panel;
+	}
+		
 	
 	private void crearPopUpCrearCliente() throws Exception{
 		// Pop-up del form para crear un cliente	
@@ -671,7 +865,6 @@ public class GUI extends JFrame {
 			try {
 				ControladorCliente.addCampo(jtfColNombre.getText(), jcbTipos.getSelectedItem().toString());
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 				JOptionPane.showMessageDialog(null,e.getMessage() ,"alert", JOptionPane.ERROR_MESSAGE);
 			}
@@ -679,7 +872,6 @@ public class GUI extends JFrame {
 			try {
 				llenarTabla(ControladorCliente.getAllClientes());
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 				JOptionPane.showMessageDialog(null,e.getMessage() ,"alert", JOptionPane.ERROR_MESSAGE);
 			}
