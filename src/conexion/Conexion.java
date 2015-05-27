@@ -69,50 +69,28 @@ public class Conexion {
 		}
 	}
 	
-	public static ResultSet executeQuery(String st){
+	public static ResultSet executeQuery(String st)throws Exception{
 		fetchConnection();
 		PreparedStatement ps=null;
-		try {
-			ps=connection.prepareStatement(st);
-			ResultSet res=ps.executeQuery();
-			close();
-			return res;
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			close();
-			return null;
-		}
-		
-	}
-	public static int executeUpdate(String st){
-		fetchConnection();
-		PreparedStatement ps=null;
-		try {
-			ps=connection.prepareStatement(st);
-			int res=ps.executeUpdate();
-			close();
-			return res;
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		ps=connection.prepareStatement(st);
+		ResultSet res=ps.executeQuery();
 		close();
-		return -1;
+		return res;
 	}
-	public static boolean execute(String st){
+	public static int executeUpdate(String st)throws Exception{
 		fetchConnection();
 		PreparedStatement ps=null;
-		try {
-			ps=connection.prepareStatement(st);
-			boolean res=ps.execute();
-			close();
-			return res;
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		ps=connection.prepareStatement(st);
+		int res=ps.executeUpdate();
 		close();
-		return false;
+		return res;
+	}
+	public static boolean execute(String st)throws Exception{
+		fetchConnection();
+		PreparedStatement ps=null;
+		ps=connection.prepareStatement(st);
+		boolean res=ps.execute();
+		close();
+		return res;
 	}
 }

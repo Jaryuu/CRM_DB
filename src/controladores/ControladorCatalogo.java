@@ -12,7 +12,7 @@ import conexion.Conexion;
 
 public class ControladorCatalogo {
 	//metodos para uso con aseguradora
-	public static ArrayList<Aseguradora> findAllAseguradoras(){
+	public static ArrayList<Aseguradora> findAllAseguradoras()throws Exception{
 		ArrayList<Aseguradora> res= new ArrayList<Aseguradora>();
 		ResultSet queryRes=Conexion.executeQuery("SELECT * FROM aseguradora");
 		try {
@@ -25,7 +25,7 @@ public class ControladorCatalogo {
 		}
 		return res;
 	}
-	public static Aseguradora findAseguradora(int id){
+	public static Aseguradora findAseguradora(int id)throws Exception{
 		ArrayList<Aseguradora> lista=findAllAseguradoras();
 		for(int i=0;i<lista.size();i++){
 			Aseguradora actual=lista.get(i);
@@ -36,7 +36,7 @@ public class ControladorCatalogo {
 		return null;
 	}
 	//metodos para uso con carro
-	public static ArrayList<Carro> findAllCarros(){
+	public static ArrayList<Carro> findAllCarros()throws Exception{
 		ArrayList<Carro> res= new ArrayList<Carro>();
 		ResultSet queryRes=Conexion.executeQuery("SELECT * FROM carro");
 		try {
@@ -49,7 +49,7 @@ public class ControladorCatalogo {
 		}
 		return res;
 	}
-	public static Carro findCarro(int modelo){
+	public static Carro findCarro(int modelo)throws Exception{
 		ArrayList<Carro> lista=findAllCarros();
 		for(int i=0;i<lista.size();i++){
 			Carro actual=lista.get(i);
@@ -60,7 +60,7 @@ public class ControladorCatalogo {
 		return null;
 	}
 	//metodos para uso con empresa
-	public static ArrayList<Empresa> findAllEmpresas(){
+	public static ArrayList<Empresa> findAllEmpresas()throws Exception{
 		ArrayList<Empresa> res= new ArrayList<Empresa>();
 		ResultSet queryRes=Conexion.executeQuery("SELECT * FROM empresa");
 		try {
@@ -73,7 +73,7 @@ public class ControladorCatalogo {
 		}
 		return res;
 	}
-	public static Empresa findEmpresa(int id){
+	public static Empresa findEmpresa(int id)throws Exception{
 		ArrayList<Empresa> lista=findAllEmpresas();
 		for(int i=0;i<lista.size();i++){
 			Empresa actual=lista.get(i);
@@ -84,7 +84,7 @@ public class ControladorCatalogo {
 		return null;
 	}
 	//metodos para uso con pais
-	public static ArrayList<Pais> findAllPaises(){
+	public static ArrayList<Pais> findAllPaises()throws Exception{
 		ArrayList<Pais> res= new ArrayList<Pais>();
 		ResultSet queryRes=Conexion.executeQuery("SELECT * FROM pais");
 		try {
@@ -97,7 +97,7 @@ public class ControladorCatalogo {
 		}
 		return res;
 	}
-	public static Pais findPais(int id){
+	public static Pais findPais(int id)throws Exception{
 		ArrayList<Pais> lista=findAllPaises();
 		for(int i=0;i<lista.size();i++){
 			Pais actual=lista.get(i);

@@ -20,12 +20,12 @@ public class ControladorCliente {
 		}
 	}
 	
-	public static ResultSet getAllClientes(){
+	public static ResultSet getAllClientes()throws Exception{
 		ResultSet st=Conexion.executeQuery("Select * from cliente");
 		return st;
 	}
 	//deben ser String[2] donde el indice 0 es la columna y el indice 1 es el valor
-	public static ResultSet getFilteredClientes(ArrayList<String[]> filtros){
+	public static ResultSet getFilteredClientes(ArrayList<String[]> filtros)throws Exception{
 		String query="SELECT * FROM cliente ";
 		for(int i=0;i<filtros.size();i++){
 			String[] actual=filtros.get(i);
@@ -42,7 +42,7 @@ public class ControladorCliente {
 		
 	}
 	
-	public static int insertCliente(ArrayList<String> values){
+	public static int insertCliente(ArrayList<String> values)throws Exception{
 		String query ="INSERT INTO cliente VALUES (";
 		for(int i=0;i<values.size();i++){
 			if(i!=0){
@@ -65,7 +65,7 @@ public class ControladorCliente {
 		return Conexion.executeUpdate(query);
 	}
 	
-	public static int updateCliente(String nit, ArrayList<String[]> values){
+	public static int updateCliente(String nit, ArrayList<String[]> values)throws Exception{
 		String query="UPDATE cliente ";
 		for(int i=0;i<values.size();i++){
 			String[] actual=values.get(i);
@@ -96,7 +96,7 @@ public class ControladorCliente {
 		return st;
 	}
 	
-	public static int deleteCliente(String nit){
+	public static int deleteCliente(String nit)throws Exception{
 		String query="DELETE FROM cliente WHERE nit = "+nit;
 		int st=Conexion.executeUpdate(query);
 		System.out.println("query: "+query);
@@ -114,20 +114,20 @@ public class ControladorCliente {
 		return st;
 	}
 	
-	public static boolean addCampo(String nombre, String tipo){
+	public static boolean addCampo(String nombre, String tipo)throws Exception{
 		String query="ALTER TABLE cliente ADD COLUMN "+nombre+" "+tipo;
 		boolean res=Conexion.execute(query);
 		System.out.println(query);
 		return res;
 	}
-	public static boolean deleteCampo(String nombre){
+	public static boolean deleteCampo(String nombre)throws Exception{
 		String query="ALTER TABLE cliente DROP COLUMN "+nombre;
 		boolean res=Conexion.execute(query);
 		System.out.println(query);
 		return res;
 	}
 	
-	public static ArrayList<String> getTweets(int nit){
+	public static ArrayList<String> getTweets(int nit)throws Exception{
 		MongoDBController mongo = new MongoDBController("CRM");
 		mongo.setCollection("Cliente");
 		ArrayList<String> results = new ArrayList<String>();
