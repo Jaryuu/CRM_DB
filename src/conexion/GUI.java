@@ -200,7 +200,13 @@ public class GUI extends JFrame {
 	    
 		jspUsuarios = new JScrollPane(jtbUsuarios, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		//inicializando la tabla
-		llenarTabla(ControladorCliente.getAllClientes());
+		try {
+			llenarTabla(ControladorCliente.getAllClientes());
+		} catch (Exception e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+			//agregar pop up
+		}
 		// Boton borrar
 		delete = new AbstractAction()
 		{
@@ -221,7 +227,13 @@ public class GUI extends JFrame {
 			        int modelRow = Integer.valueOf( e.getActionCommand() );
 			        String nit = ""+table.getModel().getValueAt(modelRow, 0);
 			        ((DefaultTableModel)table.getModel()).removeRow(modelRow);
-			        ControladorCliente.deleteCliente(nit);
+			        try {
+						ControladorCliente.deleteCliente(nit);
+					} catch (Exception e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+						//agregar pop up
+					}
 		    	}		    	
 		        
 		        
@@ -259,7 +271,13 @@ public class GUI extends JFrame {
 		        	datosN.add(fila);
 		        }
 		        //System.out.println(nit);
-		        ControladorCliente.updateCliente(nit, datosN);
+		        try {
+					ControladorCliente.updateCliente(nit, datosN);
+				} catch (Exception e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+					//agregar pop up
+				}
 		    }
 		};
 		
@@ -271,7 +289,17 @@ public class GUI extends JFrame {
 		        JTable table = (JTable)e.getSource();
 		        int modelRow = Integer.valueOf( e.getActionCommand() );
 		        String nit = ""+table.getModel().getValueAt(modelRow, 0);
-		        ArrayList tweets = ControladorCliente.getTweets(Integer.parseInt(nit));
+		        ArrayList tweets=null;
+				try {
+					tweets = ControladorCliente.getTweets(Integer.parseInt(nit));
+				} catch (NumberFormatException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} catch (Exception e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+					//agregar pop up
+				}
 		        crearPopUpTweets(nit, tweets);
 		    }
 		};
@@ -303,7 +331,13 @@ public class GUI extends JFrame {
 		btnCrearCliente.setPreferredSize(new Dimension(100, 40));;
 		btnCrearCliente.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				crearPopUpCrearCliente();
+				try {
+					crearPopUpCrearCliente();
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+					//agregar pop up
+				}
 			}
 		});
 		
@@ -330,7 +364,13 @@ public class GUI extends JFrame {
 		btnMostrarFiltros = new JButton("Mostrar");
 		btnMostrarFiltros.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				mostrarFiltros();
+				try {
+					mostrarFiltros();
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+					//agregar pop up
+				}
 			}
 		});
 		btnOcultarFiltros = new JButton("Ocultar");
@@ -366,14 +406,20 @@ public class GUI extends JFrame {
 //				for (int x=0; x<filtros.size(); x++){
 //					System.out.println(filtros.get(x)[0]+ " : "+filtros.get(x)[1]);
 //				}
-				llenarTabla(ControladorCliente.getFilteredClientes(filtros));
+				try {
+					llenarTabla(ControladorCliente.getFilteredClientes(filtros));
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+					//agregar pop up
+				}
 			}
 		});	
 		ocultarFiltros();	
 		
 	}
 	
-	private void mostrarFiltros(){
+	private void mostrarFiltros() throws Exception{
 		pnlFiltros.removeAll();
 		pnlFiltros.setPreferredSize(new Dimension(300, pnlFiltros.getHeight()));
 		pnlFiltros.setLayout(new GridLayout(0,2));
@@ -439,7 +485,7 @@ public class GUI extends JFrame {
 		pnlEditarUsuario.revalidate();
 	}
 	
-	private void crearPopUpCrearCliente(){
+	private void crearPopUpCrearCliente() throws Exception{
 		// Pop-up del form para crear un cliente	
 		final JTextField jtfFoto = new JTextField();
 		final String[] pathNombre = new String[1];
@@ -616,9 +662,19 @@ public class GUI extends JFrame {
 	            JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 		if (result == JOptionPane.OK_OPTION) {
             //model.addColumn(jtfColNombre.getText(),columnNames.length-3);
-			ControladorCliente.addCampo(jtfColNombre.getText(), jcbTipos.getSelectedItem().toString());
+			try {
+				ControladorCliente.addCampo(jtfColNombre.getText(), jcbTipos.getSelectedItem().toString());
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
             //agregarColumna(jtfColNombre.getText());
-			llenarTabla(ControladorCliente.getAllClientes());
+			try {
+				llenarTabla(ControladorCliente.getAllClientes());
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
         } else {
             System.out.println("Cancelled");
         }
@@ -661,7 +717,7 @@ public class GUI extends JFrame {
 		temp[temp.length-1] = "";		
 		columnNames = temp;		
 	}
-	private void llenarTabla(ResultSet clientes){
+	private void llenarTabla(ResultSet clientes) throws Exception{
 		this.clientes=clientes;
 		columnNames = new String[]{};
 		columnBorrar=columnNames.length-1;
