@@ -151,7 +151,6 @@ public class GUI extends JFrame {
 	    fotoListener = new ListSelectionListener() {
 		      public void valueChanged(ListSelectionEvent e) {
 		    	  if (e.getValueIsAdjusting()){
-		    		  System.out.println("listener");
 		    		  String selectedData = null;
 
 				        int[] selectedRow = jtbUsuarios.getSelectedRows();
@@ -190,6 +189,7 @@ public class GUI extends JFrame {
 				        		fFotos.set(row, imgFile);
 				        		model.setValueAt(newIcon, row, column);				        		
 				        	}else{
+				        		model.setValueAt(null, row, column);
 				        		System.out.println("Error al cambiar la imagen");
 				        	}				        	
 				        }
@@ -688,7 +688,9 @@ public class GUI extends JFrame {
 		final JTextField jtfFoto = new JTextField();
 		final String[] pathNombre = new String[1];
 		JPanel pnlPadre = new JPanel();
-		JPanel pnlPopUp = new JPanel(new GridLayout(0, 1));		
+		JPanel pnlPopUp = new JPanel(new GridLayout(0, 1));	
+		JLabel lblImagen = new JLabel();
+		lblImagen.setPreferredSize(new Dimension(50, 50));
 		JButton cargar = new JButton("Cargar");		
 		valCamposPopUp = new ArrayList<JTextField>();
 		lblCamposPopUp = new ArrayList<JLabel>();		
@@ -731,7 +733,7 @@ public class GUI extends JFrame {
 				}
 				else if (campo.equals("foto")){					
 					valCamposPopUp.add(jtfFoto);
-					// Funcion para cargar image
+					// Funcion para cargar imagen
 					ActionListener cargarImagen = new ActionListener()
 			        {
 			            public void actionPerformed(ActionEvent e)
@@ -739,10 +741,14 @@ public class GUI extends JFrame {
 			            	File fileImg = mostrarChooser();
 			            	ImageIcon icon = fileAImagen(fileImg);
 			            	if (icon != null){
+			            		ImageIcon newIcon = resizeImage(icon, 50, 50);
+			            		lblImagen.setIcon(newIcon);
 			            		jtfFoto.setText(fileImg.getName());
 			                    pathNombre[0] = fileImg.getAbsolutePath();
 			            	}else{
 			            		System.out.println("Error al cargar la imagen");
+			            		jtfFoto.setText("");
+			            		lblImagen.setIcon(null);
 			            	}			            	
 			            }
 			        };
@@ -751,10 +757,13 @@ public class GUI extends JFrame {
 				}
 				else{
 					valCamposPopUp.add(new JTextField());
-				}
+				}				
 				pnlPopUp.add(lblCamposPopUp.get(x));
-				pnlPopUp.add((Component) valCamposPopUp.get(x));
 				if (agrFoto){
+					//pnlPopUp.add(lblImagen);
+				}
+				pnlPopUp.add((Component) valCamposPopUp.get(x));
+				if (agrFoto){								
 					pnlPopUp.add(cargar);
 				}
 			}			
@@ -869,6 +878,19 @@ public class GUI extends JFrame {
             //agregarColumna(jtfColNombre.getText());
 			try {
 				llenarTabla(ControladorCliente.getAllClientes());
+				ButtonColumn buttonBorrar = new ButtonColumn(jtbUsuarios, delete, columnBorrar);
+				jtbUsuarios.getColumnModel().getColumn(columnBorrar).setMaxWidth(100);
+				jtbUsuarios.setRowHeight(30);
+				
+				// Boton actualizar
+				ButtonColumn buttonActualizar = new ButtonColumn(jtbUsuarios, AAactualizar, columnActualizar);
+				jtbUsuarios.getColumnModel().getColumn(columnActualizar).setMinWidth(120);
+				jtbUsuarios.getColumnModel().getColumn(columnActualizar).setMaxWidth(120);
+				
+				// Boton de los tweets
+				ButtonColumn buttonTweets = new ButtonColumn(jtbUsuarios, AAmostrarTweets, columnMostrarT);
+				jtbUsuarios.getColumnModel().getColumn(columnMostrarT).setMaxWidth(100);
+				jtbUsuarios.setRowHeight(30);
 			} catch (Exception e) {
 				e.printStackTrace();
 				JOptionPane.showMessageDialog(null,e.getMessage() ,"alert", JOptionPane.ERROR_MESSAGE);
@@ -903,18 +925,6 @@ public class GUI extends JFrame {
 				JOptionPane.INFORMATION_MESSAGE);		
 	}
 	
-	// Este metodo agrega una columna antes de los botones
-	private void agregarColumna(String nombre){		
-		String [] temp = new String[columnNames.length+1];
-		for (int x=0; x<columnNames.length-3;x++){
-			temp[x] = columnNames[x];
-		}
-		temp[temp.length-4] = nombre;
-		temp[temp.length-3] = "";
-		temp[temp.length-2] = "";
-		temp[temp.length-1] = "";		
-		columnNames = temp;		
-	}
 	private void llenarTabla(ResultSet clientes) throws Exception{
 		this.clientes=clientes;
 		tiposCols.clear();
