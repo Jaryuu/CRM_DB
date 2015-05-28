@@ -1,3 +1,11 @@
+/*
+ *	Universidad del Valle de Guatemala 
+ * 	Bases de Datos
+ * 	Proyecto 2
+ * 	Julio Ayala, Diego Perez, Ricardo Zepeda
+ * 	Interfaz gráfica
+ */
+
 package conexion;
 
 import java.awt.BorderLayout;
@@ -507,9 +515,10 @@ public class GUI extends JFrame {
 	private void crearPopUpCatalogos(){	
 		JPanel pnlCatalogos = agregarCatalogo(new JPanel(),"");
 		pnlCatalogos.setPreferredSize(new Dimension(300, 300));
+		JScrollPane jsp = new JScrollPane(pnlCatalogos);
 //		JOptionPane pane = new JOptionPane(null, JOptionPane.INFORMATION_MESSAGE);
 //		pane.showMessageDialog(null, pnlCatalogos);
-		JOptionPane.showMessageDialog(null, pnlCatalogos, "Catálogos",
+		JOptionPane.showMessageDialog(null, jsp, "Catálogos",
 				JOptionPane.CLOSED_OPTION);
 	}
 	
@@ -693,7 +702,7 @@ public class GUI extends JFrame {
 		return panel;
 	}
 		
-	
+	// Esto muestra un popup con las opciones para crear un cliente
 	private void crearPopUpCrearCliente() throws Exception{
 		// Pop-up del form para crear un cliente	
 		final JTextField jtfFoto = new JTextField();
@@ -862,6 +871,7 @@ public class GUI extends JFrame {
         }
 	}
 	
+	// Crea popup para agregar columna
 	private void crearPopUpAgrCol(){
 		// Pop-up del form para crear un cliente		
 		JPanel pnlPopUpAgrCol = new JPanel(new GridLayout(0, 1));
