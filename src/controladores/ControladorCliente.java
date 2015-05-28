@@ -65,10 +65,10 @@ public class ControladorCliente {
 			}
 			
 			if(i==0){
-				query+="WHERE "+actual[0]+" = "+actual[1];
+				query+="WHERE "+actual[0]+" = '"+actual[1]+"'";
 			}
 			else{
-				query+=" AND "+actual[0]+" = "+actual[1];
+				query+=" AND "+actual[0]+" = '"+actual[1]+"'";
 			}
 		}
 		ResultSet st=Conexion.executeQuery(query);

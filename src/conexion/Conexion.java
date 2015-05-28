@@ -85,6 +85,9 @@ public class Conexion {
 			if(message.contains("para tipo date")){
 				message="Ingrese una fecha valida";
 			}
+			else if(message.contains("para integer")){
+				message="Ingrese un numero valido";
+			}
 			throw new Exception(message);
 		}
 		close();
@@ -104,6 +107,9 @@ public class Conexion {
 			System.out.println(e.getMessage());
 			if(message.contains("para tipo date")){
 				message="Ingrese una fecha valida";
+			}
+			else if(message.contains("para integer")){
+				message="Ingrese un numero valido";
 			}
 			throw new Exception(message);
 		}
