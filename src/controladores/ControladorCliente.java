@@ -123,7 +123,7 @@ public class ControladorCliente {
 			if(i!=0){
 				query+=",";
 			}
-			query+=values.get(i);
+			query+="'"+values.get(i)+"'";
 		}
 		query+=")";
 		
@@ -144,6 +144,13 @@ public class ControladorCliente {
 	
 	public static int updateCliente(String nit, ArrayList<String[]> values)throws Exception{
 		String query="UPDATE cliente ";
+		int nitv=-1;
+		try{
+			nitv=Integer.parseInt(values.get(0)[1]);
+		}
+		catch(Exception e){
+			throw new Exception("El nit debe ser un numero");
+		}
 		for(int i=0;i<values.size();i++){
 			String[] actual=values.get(i);
 			
@@ -177,10 +184,10 @@ public class ControladorCliente {
 			}
 			
 			if(i==0){
-				query+="SET "+actual[0]+" = "+actual[1];
+				query+="SET "+actual[0]+" = '"+actual[1]+"'";
 			}
 			else{
-				query+=", "+actual[0]+" = "+actual[1];
+				query+=", "+actual[0]+" = '"+actual[1]+"'";
 			}
 		}
 		query+=" WHERE nit = "+nit;
@@ -192,7 +199,9 @@ public class ControladorCliente {
 		mongo.setCollection("Cliente");
 		
 		try{
-			mongo.update(Integer.parseInt(nit), Integer.parseInt(values.get(0)[1]));
+			if(nitv!=-1){
+				mongo.update(nitv, Integer.parseInt(values.get(0)[1]));
+			}
 		}
 		catch(Exception e){
 			System.out.println(e);

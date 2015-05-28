@@ -46,6 +46,7 @@ import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
@@ -189,7 +190,11 @@ public class GUI extends JFrame {
 				        		fFotos.set(row, imgFile);
 				        		model.setValueAt(newIcon, row, column);				        		
 				        	}else{
-				        		model.setValueAt(null, row, column);
+//				        		File imgFile2 = new File(System.getProperty("user.dir")+"\\"+nCarpetaImagenes+"\\default.png");
+//				        		//System.out.println(System.getProperty("user.dir")+"\\"+nCarpetaImagenes+"\\default.png");				        	
+//				        		ImageIcon icon2 = fileAImagen(imgFile2);
+//				        		ImageIcon newIcon2 = resizeImage(icon2, 50, 50);
+//				        		model.setValueAt(newIcon2, row, column);
 				        		System.out.println("Error al cambiar la imagen");
 				        	}				        	
 				        }
@@ -265,12 +270,14 @@ public class GUI extends JFrame {
 		        	}else{
 		        		fila[1]=String.valueOf(table.getModel().getValueAt(modelRow, i));
 		        	}	
-		        	if (i<tiposCols.size()){
-		        		String tipo = tiposCols.get(i); 		        	
-			        	if (tipo.equals("varchar") || tipo.equals("date")){
-	        				fila[1]="'"+fila[1]+"'";
-	        			}
-		        	}		        	
+//		        	if (i<tiposCols.size()){
+//		        		String tipo = tiposCols.get(i); 		        	
+//			        	if (tipo.equals("varchar") || tipo.equals("date")){
+//	        				fila[1]="'"+fila[1]+"'";
+//	        			}else{
+//	        				
+//	        			}
+//		        	}		        	
 		        	datosN.add(fila);
 		        }
 		        //System.out.println(nit);
@@ -758,13 +765,12 @@ public class GUI extends JFrame {
 				else{
 					valCamposPopUp.add(new JTextField());
 				}				
-				pnlPopUp.add(lblCamposPopUp.get(x));
-				if (agrFoto){
-					//pnlPopUp.add(lblImagen);
-				}
-				pnlPopUp.add((Component) valCamposPopUp.get(x));
-				if (agrFoto){								
+				pnlPopUp.add(lblCamposPopUp.get(x));							
+				if (agrFoto){													
+					pnlPopUp.add((Component) valCamposPopUp.get(x));
 					pnlPopUp.add(cargar);
+				}else{
+					pnlPopUp.add((Component) valCamposPopUp.get(x));
 				}
 			}			
 		}
@@ -790,7 +796,8 @@ public class GUI extends JFrame {
             		JTextField text=(JTextField)actual;
             		if (x<tiposCols.size()){
             			if (tiposCols.get(x).equals("varchar") || tiposCols.get(x).equals("date")){
-            				add="'"+text.getText()+"'";
+            				//add="'"+text.getText()+"'";
+            				add = text.getText();
             			}else{
             				add = text.getText();
             			}
@@ -957,7 +964,7 @@ public class GUI extends JFrame {
 					//System.out.println(typeNumToString(metadata.getColumnType(i+1)));
 					tiposCols.add(typeNumToString(metadata.getColumnType(i+1)));					
 					columnNames[i]=metadata.getColumnName(i+1);
-					System.out.println(columnNames[i]);
+					//System.out.println(columnNames[i]);
 					if (columnNames[i].equals("idpais")){
 						columnPais = i;
 					}else if (columnNames[i].equals("modelocarro")){
@@ -1128,6 +1135,11 @@ public class GUI extends JFrame {
 	}
 	
 	private File mostrarChooser(){
+		FileNameExtensionFilter filter = new FileNameExtensionFilter("Image Files", "jpg", "png", "gif", "jpeg");
+		chooser = new JFileChooser();
+		chooser.removeChoosableFileFilter(
+				chooser.getFileFilter() );
+		chooser.setFileFilter(filter);		
 		chooser.showOpenDialog(null);		
         File fileImg = chooser.getSelectedFile();
         return fileImg;
