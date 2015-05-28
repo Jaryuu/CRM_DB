@@ -138,10 +138,15 @@ public class GUI extends JFrame {
 		jtbUsuarios = new JTable( model )
         {
             //  Returning the Class of each column will allow different
-            //  renderers to be used based on Class
+            //  renderers to be used based on Class  jjjj
             public Class getColumnClass(int column)
             {                  	
                 return getValueAt(0, column).getClass();
+            }
+            
+            public boolean isCellEditable(int row, int col) {
+                int modelCol = getColumnModel().getColumn(col).getModelIndex();
+                return (modelCol != 0);
             }
         };    
         
@@ -744,7 +749,8 @@ public class GUI extends JFrame {
 					}
 					valCamposPopUp.add(new JComboBox(tipos));
 				}
-				else if (campo.equals("foto")){					
+				else if (campo.equals("foto")){		
+					jtfFoto.setEditable(false);
 					valCamposPopUp.add(jtfFoto);
 					// Funcion para cargar imagen
 					ActionListener cargarImagen = new ActionListener()
@@ -811,13 +817,15 @@ public class GUI extends JFrame {
             			add = text.getText();
             		}
             		if (columnNames[x].equals("foto")){
+
             			String path = pathNombre[0];
             			if (path != null && !path.equals("")){
             				boolean copia = copiarArchivo(path, System.getProperty("user.dir")+"\\"+nCarpetaImagenes+"\\"+text.getText());
+            				System.out.println(copia);
             				if (!copia){
-            					System.out.println("Error al copiar la imagen");            					
-            				}
-            				
+            					System.out.println("--Error al copiar la imagen");
+            					add = "";
+            				}            				
             			}
             			
             		}
