@@ -738,7 +738,8 @@ public class GUI extends JFrame {
 					}
 					valCamposPopUp.add(new JComboBox(tipos));
 				}
-				else if (campo.equals("foto")){					
+				else if (campo.equals("foto")){		
+					jtfFoto.setEditable(false);
 					valCamposPopUp.add(jtfFoto);
 					// Funcion para cargar imagen
 					ActionListener cargarImagen = new ActionListener()
@@ -805,13 +806,18 @@ public class GUI extends JFrame {
             			add = text.getText();
             		}
             		if (columnNames[x].equals("foto")){
+//            			if (! (text.getText().endsWith(".jpg") || text.getText().endsWith(".png") || text.getText().endsWith(".gif") || text.getText().endsWith(".jpeg"))){
+//            				System.out.println("---");
+//            				text.setText(""); 
+//            			} TODO
             			String path = pathNombre[0];
             			if (path != null && !path.equals("")){
             				boolean copia = copiarArchivo(path, System.getProperty("user.dir")+"\\"+nCarpetaImagenes+"\\"+text.getText());
+            				System.out.println(copia);
             				if (!copia){
-            					System.out.println("Error al copiar la imagen");            					
-            				}
-            				
+            					System.out.println("--Error al copiar la imagen");
+            					add = "";
+            				}            				
             			}
             			
             		}
