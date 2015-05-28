@@ -806,10 +806,6 @@ public class GUI extends JFrame {
             			add = text.getText();
             		}
             		if (columnNames[x].equals("foto")){
-//            			if (! (text.getText().endsWith(".jpg") || text.getText().endsWith(".png") || text.getText().endsWith(".gif") || text.getText().endsWith(".jpeg"))){
-//            				System.out.println("---");
-//            				text.setText(""); 
-//            			} TODO
             			String path = pathNombre[0];
             			if (path != null && !path.equals("")){
             				boolean copia = copiarArchivo(path, System.getProperty("user.dir")+"\\"+nCarpetaImagenes+"\\"+text.getText());
