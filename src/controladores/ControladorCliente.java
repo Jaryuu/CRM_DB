@@ -1,4 +1,11 @@
-package controladores;
+
+/*
+ *	Universidad del Valle de Guatemala 
+ * 	Bases de Datos
+ * 	Proyecto 2
+ * 	Julio Ayala, Diego Perez, Ricardo Zepeda
+ * 	Controlador de Cliente
+ */package controladores;
 
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -13,21 +20,12 @@ import conexion.Conexion;
 
 
 public class ControladorCliente {
-	
-	public static void main(String[] args){
-		Object blah = new ArrayList();
-		if(blah instanceof ArrayList){
-			System.out.println("true");
-		}
-		else{
-			System.out.println("false");
-		}
-	}
-	
+	//Metodo para obtener todos los clientes de la tabla
 	public static ResultSet getAllClientes()throws Exception{
 		ResultSet st=Conexion.executeQuery("Select * from cliente");
 		return st;
 	}
+	//metodos para obteneer los clientes por filtro
 	//deben ser String[2] donde el indice 0 es la columna y el indice 1 es el valor
 	public static ResultSet getFilteredClientes(ArrayList<String[]> filtros)throws Exception{
 		String query="SELECT * FROM cliente ";
@@ -76,7 +74,7 @@ public class ControladorCliente {
 		return st;
 		
 	}
-	
+	//metodo para insertar clientes
 	public static int insertCliente(ArrayList<String> values)throws Exception{
 		String query ="INSERT INTO cliente VALUES (";
 		//valor de int
@@ -126,7 +124,7 @@ public class ControladorCliente {
 			query+="'"+values.get(i)+"'";
 		}
 		query+=")";
-		
+		//obtener los tweets
 		MongoDBController mongo = new MongoDBController("CRM");
 		mongo.setCollection("Cliente");
 		TwitterController twitter = new TwitterController("cf5fLMuGEIW8vZmHzhsXJLocx",
@@ -141,7 +139,7 @@ public class ControladorCliente {
 		
 		return Conexion.executeUpdate(query);
 	}
-	
+	//hacer update para cliente
 	public static int updateCliente(String nit, ArrayList<String[]> values)throws Exception{
 		String query="UPDATE cliente ";
 		int nitv=-1;
@@ -211,7 +209,7 @@ public class ControladorCliente {
 		
 		return st;
 	}
-	
+	//metodo para borrar un cliente con el nit
 	public static int deleteCliente(String nit)throws Exception{
 		String query="DELETE FROM cliente WHERE nit = "+nit;
 		int st=Conexion.executeUpdate(query);
@@ -229,20 +227,21 @@ public class ControladorCliente {
 		
 		return st;
 	}
-	
+	//metodo para crear un campo
 	public static boolean addCampo(String nombre, String tipo)throws Exception{
 		String query="ALTER TABLE cliente ADD COLUMN "+nombre+" "+tipo;
 		boolean res=Conexion.execute(query);
 		System.out.println(query);
 		return res;
 	}
+	//metodo para eliminar un campo
 	public static boolean deleteCampo(String nombre)throws Exception{
 		String query="ALTER TABLE cliente DROP COLUMN "+nombre;
 		boolean res=Conexion.execute(query);
 		System.out.println(query);
 		return res;
 	}
-	
+	//metodo para obtener los tweets de un cliente
 	public static ArrayList<String> getTweets(int nit)throws Exception{
 		MongoDBController mongo = new MongoDBController("CRM");
 		mongo.setCollection("Cliente");
