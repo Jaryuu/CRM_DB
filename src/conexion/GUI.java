@@ -274,18 +274,9 @@ public class GUI extends JFrame {
 		        		}
 		        	}else{
 		        		fila[1]=String.valueOf(table.getModel().getValueAt(modelRow, i));
-		        	}	
-//		        	if (i<tiposCols.size()){
-//		        		String tipo = tiposCols.get(i); 		        	
-//			        	if (tipo.equals("varchar") || tipo.equals("date")){
-//	        				fila[1]="'"+fila[1]+"'";
-//	        			}else{
-//	        				
-//	        			}
-//		        	}		        	
+		        	}			        
 		        	datosN.add(fila);
 		        }
-		        //System.out.println(nit);
 		        try {
 					ControladorCliente.updateCliente(nit, datosN);
 				} catch (Exception e1) {
@@ -318,6 +309,7 @@ public class GUI extends JFrame {
 		    }
 		};
 				
+		// Botton borrar
 		ButtonColumn buttonBorrar = new ButtonColumn(jtbUsuarios, delete, columnBorrar);
 		jtbUsuarios.getColumnModel().getColumn(columnBorrar).setMaxWidth(100);
 		jtbUsuarios.setRowHeight(30);
@@ -439,6 +431,7 @@ public class GUI extends JFrame {
 	}
 	
 	private void mostrarFiltros() throws Exception{
+		// Esti exoabde 
 		pnlFiltros.removeAll();
 		pnlFiltros.setPreferredSize(new Dimension(300, pnlFiltros.getHeight()));
 		pnlFiltros.setLayout(new GridLayout(0,2));
