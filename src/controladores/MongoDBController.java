@@ -1,3 +1,11 @@
+/*
+ *	Universidad del Valle de Guatemala 
+ * 	Bases de Datos
+ * 	Proyecto 2
+ * 	Julio Ayala, Diego Perez, Ricardo Zepeda
+ * 	Controlador de mongo
+ */
+
 package controladores;
 
 import com.mongodb.BasicDBObject;
@@ -25,6 +33,7 @@ public class MongoDBController {
 	private DBCollection collection;
 	MongoClient mongoClient;
 	
+	//COnstructor recibe nombre de la db a la que se va a conectar.
 	public MongoDBController(String databaseName){
 		try{
 			MongoClient mongoClient = new MongoClient();
@@ -56,6 +65,7 @@ public class MongoDBController {
 
 
 	
+	//Inserta en la coleccion todos los tweets para un nit
 	public void insert(int nit, ArrayList<String> tweets){
 		for (String tweet:tweets){
 			BasicDBObject doc = new BasicDBObject("nit", nit)
@@ -84,6 +94,7 @@ public class MongoDBController {
 		return result;
 	}
 	
+	//Actualiza en la coleccion todos los tweets para un nit
 	public void update(int oldNit, int newNit){
 		BasicDBObject updateQuery = new BasicDBObject();
 		updateQuery.append("$set",
@@ -95,6 +106,8 @@ public class MongoDBController {
 		collection.updateMulti(searchQuery, updateQuery);			
 	}
 	
+	
+	//borra en la coleccion todos los tweets para un nit
 	public void delete(int nit){
 		
 		BasicDBObject searchQuery = new BasicDBObject();

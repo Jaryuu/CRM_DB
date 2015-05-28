@@ -1,3 +1,11 @@
+/*
+ *	Universidad del Valle de Guatemala 
+ * 	Bases de Datos
+ * 	Proyecto 2
+ * 	Julio Ayala, Diego Perez, Ricardo Zepeda
+ * 	Controlador de los catalogos
+ */
+
 package controladores;
 
 import java.sql.ResultSet;

@@ -283,6 +283,12 @@ public class GUI extends JFrame {
 					e1.printStackTrace();
 					//agregar pop up
 					JOptionPane.showMessageDialog(null,e1.getMessage() ,"alert", JOptionPane.ERROR_MESSAGE);
+					try {
+						llenarTabla(ControladorCliente.getAllClientes());
+					} catch (Exception e2) {
+						// TODO Auto-generated catch block
+						e2.printStackTrace();
+					}
 				}
 		    }
 		};

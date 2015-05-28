@@ -58,15 +58,15 @@ public class Conexion {
 	
 	public static void close(){
 		
-		if (connection != null) {	
-			try {
-				connection.close();
-				connection=null;
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
+//		if (connection != null) {	
+//			try {
+//				connection.close();
+//				connection=null;
+//			} catch (SQLException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+//		}
 	}
 	
 	public static ResultSet executeQuery(String st)throws Exception{
