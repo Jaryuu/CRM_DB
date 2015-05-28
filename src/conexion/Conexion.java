@@ -72,16 +72,41 @@ public class Conexion {
 	public static ResultSet executeQuery(String st)throws Exception{
 		fetchConnection();
 		PreparedStatement ps=null;
-		ps=connection.prepareStatement(st);
-		ResultSet res=ps.executeQuery();
+		ResultSet res=null;
+		try {
+			ps=connection.prepareStatement(st);
+			res = ps.executeQuery();
+		}
+		catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			String message=e.getMessage();
+			System.out.println(e.getMessage());
+			if(message.contains("para tipo date")){
+				message="Ingrese una fecha valida";
+			}
+			throw new Exception(message);
+		}
 		close();
 		return res;
 	}
 	public static int executeUpdate(String st)throws Exception{
 		fetchConnection();
 		PreparedStatement ps=null;
+		int res=-1;
+		try{
 		ps=connection.prepareStatement(st);
-		int res=ps.executeUpdate();
+		res=ps.executeUpdate();
+		}
+		catch(Exception e){
+			e.printStackTrace();
+			String message=e.getMessage();
+			System.out.println(e.getMessage());
+			if(message.contains("para tipo date")){
+				message="Ingrese una fecha valida";
+			}
+			throw new Exception(message);
+		}
 		close();
 		return res;
 	}

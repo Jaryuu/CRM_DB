@@ -79,6 +79,14 @@ public class ControladorCliente {
 	
 	public static int insertCliente(ArrayList<String> values)throws Exception{
 		String query ="INSERT INTO cliente VALUES (";
+		//valor de int
+		int nit=-1;
+		try{
+			nit=Integer.parseInt(values.get(0));
+		}
+		catch(Exception e){
+			throw new Exception("El nit debe ser un numero");
+		}
 		for(int i=0;i<values.size();i++){
 			
 			ArrayList<Pais> paises = ControladorCatalogo.findAllPaises();
@@ -128,8 +136,8 @@ public class ControladorCliente {
 		Random ran = new Random();
 		String[] topics = {"#NoLeToca", "#RenunciaYa","Game of Thrones", "science"};
 		ArrayList<String> tweets = twitter.searchTweets(topics[ran.nextInt(3)], 15);
-		
-		mongo.insert(Integer.parseInt(values.get(0)),tweets);
+		System.out.println(values.get(0));
+		mongo.insert(nit,tweets);
 		
 		return Conexion.executeUpdate(query);
 	}
