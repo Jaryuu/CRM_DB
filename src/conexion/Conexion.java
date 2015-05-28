@@ -1,3 +1,10 @@
+/*
+ *	Universidad del Valle de Guatemala 
+ * 	Bases de Datos
+ * 	Proyecto 2
+ * 	Julio Ayala, Diego Perez, Ricardo Zepeda
+ * 	Clase encargada de hacer la conexion con postgresql
+ */
 package conexion;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -8,12 +15,14 @@ import java.sql.SQLException;
 
 public class Conexion {
 	private static Connection connection=null;
+	//revisa si no hay una conexion existente
 	public static Connection getConexion(){
 		if(connection==null){
 			fetchConnection();
 		}
 		return connection;
 	}
+	//genera una nueva conexiox
 	public static void fetchConnection () {
  
 		System.out.println("-------- PostgreSQL "
@@ -68,7 +77,7 @@ public class Conexion {
 //			}
 //		}
 	}
-	
+	//ejecuta una query y devuelve un resultset
 	public static ResultSet executeQuery(String st)throws Exception{
 		fetchConnection();
 		PreparedStatement ps=null;
@@ -93,6 +102,7 @@ public class Conexion {
 		close();
 		return res;
 	}
+	//ejecuta un statement y devuelve un int como resultado
 	public static int executeUpdate(String st)throws Exception{
 		fetchConnection();
 		PreparedStatement ps=null;
@@ -116,6 +126,7 @@ public class Conexion {
 		close();
 		return res;
 	}
+	//ejecuta algun codigo sql, usado para agregar campos
 	public static boolean execute(String st)throws Exception{
 		fetchConnection();
 		PreparedStatement ps=null;
