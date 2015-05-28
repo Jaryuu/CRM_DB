@@ -138,7 +138,7 @@ public class GUI extends JFrame {
 		jtbUsuarios = new JTable( model )
         {
             //  Returning the Class of each column will allow different
-            //  renderers to be used based on Class
+            //  renderers to be used based on Class  jjjj
             public Class getColumnClass(int column)
             {                  	
                 return getValueAt(0, column).getClass();
