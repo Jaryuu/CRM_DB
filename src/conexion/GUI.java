@@ -143,6 +143,11 @@ public class GUI extends JFrame {
             {                  	
                 return getValueAt(0, column).getClass();
             }
+            
+            public boolean isCellEditable(int row, int col) {
+                int modelCol = getColumnModel().getColumn(col).getModelIndex();
+                return (modelCol != 0);
+            }
         };    
         
         jtbUsuarios.setPreferredScrollableViewportSize(jtbUsuarios.getPreferredSize());
@@ -806,6 +811,7 @@ public class GUI extends JFrame {
             			add = text.getText();
             		}
             		if (columnNames[x].equals("foto")){
+
             			String path = pathNombre[0];
             			if (path != null && !path.equals("")){
             				boolean copia = copiarArchivo(path, System.getProperty("user.dir")+"\\"+nCarpetaImagenes+"\\"+text.getText());
